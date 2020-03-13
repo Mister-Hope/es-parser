@@ -44,3 +44,29 @@ progress.onProgressUpdate(res => {
 });
 `,{ wx });
 ```
+
+## Known Bugs
+
+- `function` declaration can not rise to the top of the scope.
+
+    So code like below will throw an error:
+
+    ```js
+    hoisted(); // ReferenceError: hoisted is not defined
+
+    function hoisted() {
+      console.log('foo');
+    }
+    ```
+
+    In order to avoid this issue, please consider using `function expression` always:
+
+    ```js
+    const hoisted = () => {
+      console.log('foo');
+    };
+    ```
+
+## Notes
+
+- You should always access `isFinite`, `isNaN` through `Number`.

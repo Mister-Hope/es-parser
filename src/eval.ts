@@ -34,17 +34,9 @@ const evaluate = (node: ESTree.Node, scope: Scope, arg?: any) =>
 
 // eslint-disable-next-line prefer-object-spread
 evaluateMap = Object.assign(
-  {},
-  declarationHandler,
-  expressionHandler,
-  moduleHandler,
-  patternHandler,
-  statementHandler,
   {
     /** 标识符 */
     Identifier: (node: ESTree.Identifier, scope: Scope) => {
-      // TODO: Test Null
-
       // 处理 undefined
       if (node.name === 'undefined') return undefined;
 
@@ -109,7 +101,12 @@ evaluateMap = Object.assign(
     ClassBody: (node: ESTree.ClassBody, _scope: Scope) => {
       throw new Error(`${node.type} 未实现`);
     }
-  }
+  },
+  declarationHandler,
+  expressionHandler,
+  moduleHandler,
+  patternHandler,
+  statementHandler
 );
 
 export default evaluate;

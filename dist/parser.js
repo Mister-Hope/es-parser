@@ -80,7 +80,7 @@ var evaluateMap;
 var evaluate = function (node, scope, arg) {
     return evaluateMap[node.type](node, scope, arg);
 };
-evaluateMap = Object.assign({}, declaration_1.default, expression_1.default, module_1.default, pattern_1.default, statement_1.default, {
+evaluateMap = Object.assign({
     Identifier: function (node, scope) {
         if (node.name === 'undefined')
             return undefined;
@@ -124,7 +124,7 @@ evaluateMap = Object.assign({}, declaration_1.default, expression_1.default, mod
     ClassBody: function (node, _scope) {
         throw new Error(node.type + " \u672A\u5B9E\u73B0");
     }
-});
+}, declaration_1.default, expression_1.default, module_1.default, pattern_1.default, statement_1.default);
 exports.default = evaluate;
 
 
@@ -242,7 +242,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var scope_1 = __webpack_require__(1);
 var signal_1 = __webpack_require__(2);
 var eval_1 = __webpack_require__(0);
-exports.getFuntionExpression = function (node, scope) {
+exports.getFuntionExpression = function (node, scope, isArrow) {
+    if (isArrow === void 0) { isArrow = false; }
     return function Function() {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -254,7 +255,7 @@ exports.getFuntionExpression = function (node, scope) {
             var paramName = element.name;
             functionScope.let(paramName, args[index]);
         });
-        functionScope.const('this', this);
+        functionScope.const('this', isArrow ? scope.find('this') : this);
         functionScope.const('arguments', args);
         var result = eval_1.default(node.body, functionScope);
         if (result === signal_1.RETURN_SINGAL)
@@ -304,25 +305,7 @@ var expressionHandler = {
     FunctionExpression: function (node, scope) {
         return exports.getFuntionExpression(node, scope);
     },
-    ArrowFunctionExpression: function (node, scope) {
-        return function () {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i] = arguments[_i];
-            }
-            var arrowFuncScope = new scope_1.Scope('function', scope);
-            arrowFuncScope.invasived = true;
-            node.params.forEach(function (element, index) {
-                var paramName = element.name;
-                arrowFuncScope.let(paramName, args[index]);
-            });
-            arrowFuncScope.const('this', scope.find('this'));
-            arrowFuncScope.const('arguments', args);
-            var result = eval_1.default(node.body, arrowFuncScope);
-            if (result === signal_1.RETURN_SINGAL)
-                return result.result;
-        };
-    },
+    ArrowFunctionExpression: function (node, scope) { return exports.getFuntionExpression(node, scope, true); },
     YieldExpression: function (_node, _scope) {
         throw new Error('yield not supported in Wechat Miniprogram');
     },
@@ -348,10 +331,12 @@ var expressionHandler = {
                     return delete eval_1.default(object, scope)[property.name];
                 }
                 else if (node.argument.type === 'Identifier') {
-                    var $this = scope.find('this');
-                    if ($this)
-                        return $this.get()[node.argument.name];
+                    var ctx = scope.find('this');
+                    if (ctx)
+                        return ctx.get()[node.argument.name];
+                    return false;
                 }
+                return false;
             }
         }[node.operator]());
     },
@@ -424,19 +409,58 @@ var expressionHandler = {
         else
             throw new Error('出现问题');
         return {
-            '=': function (x) { return (variable.set(x), x); },
-            '+=': function (x) { return (variable.set(variable.get() + x), variable.get()); },
-            '-=': function (x) { return (variable.set(variable.get() - x), variable.get()); },
-            '*=': function (x) { return (variable.set(variable.get() * x), variable.get()); },
-            '/=': function (x) { return (variable.set(variable.get() / x), variable.get()); },
-            '%=': function (x) { return (variable.set(variable.get() % x), variable.get()); },
-            '<<=': function (x) { return (variable.set(variable.get() << x), variable.get()); },
-            '>>=': function (x) { return (variable.set(variable.get() >> x), variable.get()); },
-            '>>>=': function (x) { return (variable.set(variable.get() >>> x), variable.get()); },
-            '**=': function (x) { return (variable.set(Math.pow(variable.get(), x)), variable.get()); },
-            '|=': function (x) { return (variable.set(variable.get() | x), variable.get()); },
-            '^=': function (x) { return (variable.set(variable.get() ^ x), variable.get()); },
-            '&=': function (x) { return (variable.set(variable.get() & x), variable.get()); }
+            '=': function (x) {
+                variable.set(x);
+                return x;
+            },
+            '+=': function (x) {
+                variable.set(variable.get() + x);
+                return variable.get();
+            },
+            '-=': function (x) {
+                variable.set(variable.get() - x);
+                return variable.get();
+            },
+            '*=': function (x) {
+                variable.set(variable.get() * x);
+                return variable.get();
+            },
+            '/=': function (x) {
+                variable.set(variable.get() / x);
+                return variable.get();
+            },
+            '%=': function (x) {
+                variable.set(variable.get() % x);
+                return variable.get();
+            },
+            '<<=': function (x) {
+                variable.set(variable.get() << x);
+                return variable.get();
+            },
+            '>>=': function (x) {
+                variable.set(variable.get() >> x);
+                return variable.get();
+            },
+            '>>>=': function (x) {
+                variable.set(variable.get() >>> x);
+                return variable.get();
+            },
+            '**=': function (x) {
+                variable.set(Math.pow(variable.get(), x));
+                return variable.get();
+            },
+            '|=': function (x) {
+                variable.set(variable.get() | x);
+                return variable.get();
+            },
+            '^=': function (x) {
+                variable.set(variable.get() ^ x);
+                return variable.get();
+            },
+            '&=': function (x) {
+                variable.set(variable.get() & x);
+                return variable.get();
+            }
         }[node.operator](eval_1.default(node.right, scope));
     },
     LogicalExpression: function (node, scope) {
@@ -526,14 +550,8 @@ var defaultApi = {
     decodeURIComponent: decodeURIComponent,
     escape: escape,
     unescape: unescape,
-    Infinity: Infinity,
-    NaN: NaN,
-    isFinite: isFinite,
-    isNaN: isNaN,
     parseFloat: parseFloat,
     parseInt: parseInt,
-    Object: Object,
-    Boolean: Boolean,
     Error: Error,
     EvalError: EvalError,
     RangeError: RangeError,
@@ -541,6 +559,9 @@ var defaultApi = {
     SyntaxError: SyntaxError,
     TypeError: TypeError,
     URIError: URIError,
+    Object: Object,
+    Boolean: Boolean,
+    Function: Function,
     Number: Number,
     Math: Math,
     Date: Date,

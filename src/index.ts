@@ -28,15 +28,9 @@ const defaultApi: { [key: string]: any } = {
   decodeURIComponent,
   escape,
   unescape,
-
-  Infinity,
-  NaN,
-  isFinite,
-  isNaN,
   parseFloat,
   parseInt,
-  Object,
-  Boolean,
+
   Error,
   EvalError,
   RangeError,
@@ -44,6 +38,10 @@ const defaultApi: { [key: string]: any } = {
   SyntaxError,
   TypeError,
   URIError,
+
+  Object,
+  Boolean,
+  Function,
   Number,
   Math,
   Date,

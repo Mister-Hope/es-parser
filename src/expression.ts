@@ -1,6 +1,4 @@
-/* eslint-disable consistent-return */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-sequences */
 /* eslint-disable no-bitwise */
 import * as ESTree from 'estree';
 import { Scope, Variable } from './scope';
@@ -10,9 +8,10 @@ import evaluate from './eval';
 /** 获取函数体 */
 export const getFuntionExpression = (
   node: ESTree.BaseFunction,
-  scope: Scope
-) => {
-  return function Function(...args: any[]) {
+  scope: Scope,
+  isArrow = false
+) =>
+  function Function(...args: any[]) {
     /** 函数作用域 */
     const functionScope = new Scope('function', scope);
 
@@ -24,8 +23,10 @@ export const getFuntionExpression = (
       functionScope.let(paramName, args[index]);
     });
 
-    // 声明 this 和 arguments
-    functionScope.const('this', this);
+    // 普通函数获得当前this，箭头函数获得父级的 this 表达式
+    functionScope.const('this', isArrow ? scope.find('this') : this);
+
+    // 声明 arguments
     functionScope.const('arguments', args);
 
     // 执行函数
@@ -34,7 +35,6 @@ export const getFuntionExpression = (
     // 如果存在返回值，则返回
     if (result === RETURN_SINGAL) return result.result;
   };
-};
 
 const expressionHandler = {
   /** `this` 表达式 */
@@ -98,36 +98,14 @@ const expressionHandler = {
   },
 
   /** 函数表达式 */
-  FunctionExpression: (node: ESTree.FunctionExpression, scope: Scope) => {
-    return getFuntionExpression(node, scope);
-  },
+  FunctionExpression: (node: ESTree.FunctionExpression, scope: Scope) =>
+    getFuntionExpression(node, scope),
 
   /** 箭头函数表达式 */
   ArrowFunctionExpression: (
     node: ESTree.ArrowFunctionExpression,
     scope: Scope
-  ) => {
-    // TODO: Test `this`
-
-    return (...args: any[]) => {
-      const arrowFuncScope = new Scope('function', scope);
-
-      arrowFuncScope.invasived = true;
-
-      // 在函数作用域内声明函数参数
-      node.params.forEach((element, index) => {
-        const paramName = (element as ESTree.Identifier).name;
-        arrowFuncScope.let(paramName, args[index]);
-      });
-
-      // 获得上下文中的 this 表达式
-      arrowFuncScope.const('this', scope.find('this'));
-      arrowFuncScope.const('arguments', args);
-      const result = evaluate(node.body, arrowFuncScope);
-      if (result === RETURN_SINGAL) return result.result;
-    };
-    // throw new Error('箭头函数未实现');
-  },
+  ) => getFuntionExpression(node, scope, true),
 
   /** yield 表达式 */
   YieldExpression: (_node: ESTree.YieldExpression, _scope: Scope) => {
@@ -144,7 +122,6 @@ const expressionHandler = {
       '~': () => ~evaluate(node.argument, scope),
       // eslint-disable-next-line no-void
       void: () => void evaluate(node.argument, scope),
-      /** 获得类型 */
       typeof: () => {
         if (node.argument.type === 'Identifier') {
           const variable = scope.find(node.argument.name);
@@ -165,10 +142,14 @@ const expressionHandler = {
             (property as ESTree.Identifier).name
           ];
         } else if (node.argument.type === 'Identifier') {
-          const $this = scope.find('this');
+          const ctx = scope.find('this');
 
-          if ($this) return $this.get()[node.argument.name];
+          if (ctx) return ctx.get()[node.argument.name];
+
+          return false;
         }
+
+        return false;
       }
     }[node.operator]()),
 
@@ -252,19 +233,58 @@ const expressionHandler = {
     } else throw new Error('出现问题');
 
     return {
-      '=': (x: any) => (variable.set(x), x),
-      '+=': (x: any) => (variable.set(variable.get() + x), variable.get()),
-      '-=': (x: any) => (variable.set(variable.get() - x), variable.get()),
-      '*=': (x: any) => (variable.set(variable.get() * x), variable.get()),
-      '/=': (x: any) => (variable.set(variable.get() / x), variable.get()),
-      '%=': (x: any) => (variable.set(variable.get() % x), variable.get()),
-      '<<=': (x: any) => (variable.set(variable.get() << x), variable.get()),
-      '>>=': (x: any) => (variable.set(variable.get() >> x), variable.get()),
-      '>>>=': (x: any) => (variable.set(variable.get() >>> x), variable.get()),
-      '**=': (x: any) => (variable.set(variable.get() ** x), variable.get()),
-      '|=': (x: any) => (variable.set(variable.get() | x), variable.get()),
-      '^=': (x: any) => (variable.set(variable.get() ^ x), variable.get()),
-      '&=': (x: any) => (variable.set(variable.get() & x), variable.get())
+      '=': (x: any) => {
+        variable.set(x);
+        return x;
+      },
+      '+=': (x: any) => {
+        variable.set(variable.get() + x);
+        return variable.get();
+      },
+      '-=': (x: any) => {
+        variable.set(variable.get() - x);
+        return variable.get();
+      },
+      '*=': (x: any) => {
+        variable.set(variable.get() * x);
+        return variable.get();
+      },
+      '/=': (x: any) => {
+        variable.set(variable.get() / x);
+        return variable.get();
+      },
+      '%=': (x: any) => {
+        variable.set(variable.get() % x);
+        return variable.get();
+      },
+      '<<=': (x: any) => {
+        variable.set(variable.get() << x);
+        return variable.get();
+      },
+      '>>=': (x: any) => {
+        variable.set(variable.get() >> x);
+        return variable.get();
+      },
+      '>>>=': (x: any) => {
+        variable.set(variable.get() >>> x);
+        return variable.get();
+      },
+      '**=': (x: any) => {
+        variable.set(variable.get() ** x);
+        return variable.get();
+      },
+      '|=': (x: any) => {
+        variable.set(variable.get() | x);
+        return variable.get();
+      },
+      '^=': (x: any) => {
+        variable.set(variable.get() ^ x);
+        return variable.get();
+      },
+      '&=': (x: any) => {
+        variable.set(variable.get() & x);
+        return variable.get();
+      }
     }[node.operator](evaluate(node.right, scope));
   },
 
