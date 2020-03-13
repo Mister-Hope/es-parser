@@ -1,0 +1,198 @@
+root: true
+
+env:
+  es6: true
+
+parser: "@typescript-eslint/parser"
+
+parserOptions:
+  ecmaVersion: 6
+  project: "./tsconfig.json"
+  sourceType: module
+  ecmaFeatures:
+    modules: true
+
+extends:
+  - eslint:all
+  - plugin:prettier/recommended
+
+plugins:
+  - prettier
+
+rules:
+  no-useless-constructor:
+    - off
+
+  arrow-parens:
+    - error
+    - as-needed
+
+  class-methods-use-this:
+    - off
+
+  comma-dangle:
+    - error
+    - never
+
+  complexity:
+    - warn
+    - max: 25
+
+  capitalized-comments:
+    - off
+
+  curly:
+    - error
+    - multi
+
+  global-require:
+    - off
+
+  id-length:
+    - error
+    - min: 2
+      exceptions:
+        - a
+        - i
+        - j
+        - x
+        - y
+        - T
+
+  implicit-arrow-linebreak:
+    - off
+
+  indent:
+    - off
+    - 2
+    - ignoredNodes:
+        - ConditionalExpression
+
+  init-declarations:
+    - off
+
+  function-call-argument-newline:
+    - error
+    - consistent
+
+  line-comment-position:
+    - off
+
+  max-lines:
+    - warn
+    - 500
+
+  max-lines-per-function:
+    - warn
+    - 80
+
+  max-statements:
+    - warn
+    - 25
+
+  new-cap:
+    - off
+
+  nonblock-statement-body-position:
+    - error
+    - any
+
+  no-console:
+    - off
+
+  no-debugger:
+    - off
+
+  no-inline-comments:
+    - off
+
+  no-magic-numbers:
+    - off
+
+  no-multi-assign:
+    - off
+
+  no-nested-ternary:
+    - off
+
+  no-param-reassign:
+    - error
+    - props: false
+
+  no-plusplus:
+    - error
+    - allowForLoopAfterthoughts: true
+
+  no-sync:
+    - off
+
+  no-ternary:
+    - off
+
+  no-undefined:
+    - off
+
+  no-unused-vars:
+    - off
+
+  no-warning-comments:
+    - warn
+
+  object-curly-spacing:
+    - off
+
+  one-var:
+    - error
+    - never
+
+  padded-blocks:
+    - error
+    - never
+
+  prefer-destructuring:
+    - error
+    - object: true
+      array: false
+
+  prefer-named-capture-group:
+    - off
+
+  quotes:
+    - off
+
+  radix:
+    - error
+    - as-needed
+
+  sort-keys:
+    - off
+
+  strict:
+    - off
+
+overrides:
+  - files:
+      - "test/*.ts"
+
+    env:
+      mocha: true
+      node: true
+
+  - files:
+      - "*.ts"
+
+    extends:
+      - plugin:@typescript-eslint/eslint-recommended
+      - plugin:@typescript-eslint/recommended
+      - prettier/@typescript-eslint
+
+    plugins:
+      - "@typescript-eslint"
+
+    rules:
+      "@typescript-eslint/explicit-function-return-type": off
+      # "@typescript-eslint/explicit-function-return-type":
+      #   - warn
+      #   - allowTypedFunctionExpressions: true
+
+      "@typescript-eslint/no-explicit-any": off

@@ -1,0 +1,20 @@
+language: node_js
+os: linux
+dist: bionic
+node_js:
+  - lts/*
+jobs:
+  include:
+    - stage: ts-test
+      name: "Test in TypeScript"
+      script:
+        - yarn run test
+
+    - stage: js-test
+      name: "Test in JavaScript"
+      script:
+        - yarn run test:js
+
+stages:
+  - name: ts-test
+  - name: js-test

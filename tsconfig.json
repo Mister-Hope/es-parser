@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/", // 打包到的目录
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "alwaysStrict": false,
+    "declaration": false,
+    "diagnostics": false,
+    "downlevelIteration": false,
+    "experimentalDecorators": true,
+    "esModuleInterop": false,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": false,
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    "listEmittedFiles": true,
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "noEmitHelpers": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": false,
+    // "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "pretty": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "target": "es5",
+  },
+  "include": [
+    "src/*",
+    "test/*"
+  ]
+}

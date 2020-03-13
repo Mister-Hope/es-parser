@@ -1,0 +1,5 @@
+src/
+test/
+.eslintignore
+.eslintrc.yml
+.prettierrc.yml
