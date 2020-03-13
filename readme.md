@@ -19,6 +19,18 @@ import * as esParser from 'es-parser';
 const esParser = require('es-parser');
 ```
 
+## API
+
+- run:
+
+```ts
+run(codeString: string, globalMap: GlobalMap)
+
+interface GlobalMap{
+  [prop: globalIdentifier]: value
+}
+```
+
 ## Demo
 
 ```js
@@ -43,6 +55,7 @@ progress.onProgressUpdate(res => {
   wx.showLoading({ title: \`下载中\${Math.round(res.progress)}%\` });
 });
 `,{ wx });
+// this will pass the global variable `wx` to the parser
 ```
 
 ## Known Bugs
