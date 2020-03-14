@@ -20,7 +20,13 @@ jobs:
       script:
         - yarn run test:js
 
+    - stage: self-parse-test
+      name: "Parser self parse test"
+      script:
+        - yarn run test:parser
+
 stages:
   - name: build
   - name: ts-test
   - name: js-test
+  - name: self-parse-test

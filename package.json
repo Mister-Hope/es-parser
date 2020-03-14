@@ -8,9 +8,10 @@
     "dev": "webpack --watch",
     "build": "webpack --config webpack.config.js",
     "test": "mocha -r ts-node/register test/unit/**/*.ts",
+    "test:parser": "ts-node ./test/parser.ts",
     "test:dev": "mocha -r ts-node/register  --watch test/unit/**/*.ts",
     "test:js": "mocha ./test/unit/index.js",
-    "test:parse": "node ./test/parse.js",
+    "parse": "node ./test/parse.js",
     "lint": "eslint . --fix",
     "lint:check": "eslint .",
     "commit": "npx git-cz"
