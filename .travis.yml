@@ -5,6 +5,11 @@ node_js:
   - lts/*
 jobs:
   include:
+    - stage: build
+      name: build es-parser
+      script:
+        - yarn run build
+
     - stage: ts-test
       name: "Test in TypeScript"
       script:
@@ -16,5 +21,6 @@ jobs:
         - yarn run test:js
 
 stages:
+  - name: build
   - name: ts-test
   - name: js-test
