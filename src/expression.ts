@@ -2,18 +2,13 @@
 /* eslint-disable no-bitwise */
 import * as ESTree from 'estree';
 import { Scope, Variable } from './scope';
+import { getFunction, getThis } from './common';
 import evaluate from './eval';
-import { getFunction } from './common';
 
 const expressionHandler = {
   /** `this` 表达式 */
-  ThisExpression: (_node: ESTree.ThisExpression, scope: Scope) => {
-    // 尝试寻找
-    const result = scope.find('this');
-
-    // 返回结果或 null
-    return result ? result.get() : null;
-  },
+  ThisExpression: (_node: ESTree.ThisExpression, scope: Scope) =>
+    getThis(scope),
 
   /** 数组表达式 */
   ArrayExpression: (node: ESTree.ArrayExpression, scope: Scope) =>
@@ -27,14 +22,14 @@ const expressionHandler = {
     // 遍历对象属性
     for (const property of node.properties) {
       const { kind } = property;
-      let key;
+      let propertyName;
 
       switch (property.key.type) {
         case 'Literal':
-          key = evaluate(property.key, scope);
+          propertyName = evaluate(property.key, scope);
           break;
         case 'Identifier':
-          key = property.key.name;
+          propertyName = property.key.name;
           break;
         default:
           // 暂不能处理该键值的对象 TODO: 完善
@@ -48,16 +43,18 @@ const expressionHandler = {
       switch (kind) {
         // 普通属性
         case 'init':
-          object[key] = value;
+          object[propertyName] = value;
           break;
+
         // Getter
         case 'get':
-          Object.defineProperty(object, key, { get: value });
+          Object.defineProperty(object, propertyName, { get: value });
           break;
+
         // Setter
         case 'set':
           // eslint-disable-next-line accessor-pairs
-          Object.defineProperty(object, key, { set: value });
+          Object.defineProperty(object, propertyName, { set: value });
           break;
         default:
       }
@@ -95,7 +92,7 @@ const expressionHandler = {
         if (node.argument.type === 'Identifier') {
           const variable = scope.find(node.argument.name);
 
-          return variable === undefined ? 'undefined' : typeof variable.get();
+          return variable === undefined ? 'undefined' : typeof variable.value;
         }
 
         return typeof evaluate(node.argument, scope);
@@ -111,11 +108,9 @@ const expressionHandler = {
             (property as ESTree.Identifier).name
           ];
         } else if (node.argument.type === 'Identifier') {
-          const ctx = scope.find('this');
+          const ctx = getThis(scope);
 
-          if (ctx) return ctx.get()[node.argument.name];
-
-          return false;
+          return ctx ? ctx.value[node.argument.name] : false;
         }
 
         return false;
@@ -137,18 +132,26 @@ const expressionHandler = {
         : (argument.property as ESTree.Identifier).name;
 
       variable = {
-        get: () => object[property],
-        set(value: any) {
+        get value() {
+          return object[property];
+        },
+        set value(value: any) {
           object[property] = value;
         }
       };
     }
 
     return {
-      // eslint-disable-next-line
-      '--': (x: number) => (variable.set(x - 1), prefix ? --x : x--),
-      // eslint-disable-next-line
-      '++': (x: number) => (variable.set(x + 1), prefix ? ++x : x++)
+      '--': (x: number) => {
+        variable.value = x - 1;
+        // eslint-disable-next-line
+        return prefix ? --x : x--;
+      },
+      '++': (x: number) => {
+        variable.value = x + 1;
+        // eslint-disable-next-line
+        return prefix ? ++x : x++;
+      }
     }[node.operator](evaluate(node.argument, scope));
   },
 
@@ -199,66 +202,29 @@ const expressionHandler = {
 
       // 生成变量对象
       variable = {
-        get: () => object[property],
-        set(value: any) {
+        get value() {
+          return object[property];
+        },
+        set value(value: any) {
           object[property] = value;
         }
       };
     } else throw new TypeError(`Can not assign to type ${node.left.type}`);
 
     return {
-      '=': (x: any) => {
-        variable.set(x);
-        return x;
-      },
-      '+=': (x: any) => {
-        variable.set(variable.get() + x);
-        return variable.get();
-      },
-      '-=': (x: any) => {
-        variable.set(variable.get() - x);
-        return variable.get();
-      },
-      '*=': (x: any) => {
-        variable.set(variable.get() * x);
-        return variable.get();
-      },
-      '/=': (x: any) => {
-        variable.set(variable.get() / x);
-        return variable.get();
-      },
-      '%=': (x: any) => {
-        variable.set(variable.get() % x);
-        return variable.get();
-      },
-      '<<=': (x: any) => {
-        variable.set(variable.get() << x);
-        return variable.get();
-      },
-      '>>=': (x: any) => {
-        variable.set(variable.get() >> x);
-        return variable.get();
-      },
-      '>>>=': (x: any) => {
-        variable.set(variable.get() >>> x);
-        return variable.get();
-      },
-      '**=': (x: any) => {
-        variable.set(variable.get() ** x);
-        return variable.get();
-      },
-      '|=': (x: any) => {
-        variable.set(variable.get() | x);
-        return variable.get();
-      },
-      '^=': (x: any) => {
-        variable.set(variable.get() ^ x);
-        return variable.get();
-      },
-      '&=': (x: any) => {
-        variable.set(variable.get() & x);
-        return variable.get();
-      }
+      '=': (x: any) => (variable.value = x),
+      '+=': (x: any) => (variable.value += x),
+      '-=': (x: any) => (variable.value -= x),
+      '*=': (x: any) => (variable.value *= x),
+      '/=': (x: any) => (variable.value /= x),
+      '%=': (x: any) => (variable.value %= x),
+      '<<=': (x: any) => (variable.value <<= x),
+      '>>=': (x: any) => (variable.value >>= x),
+      '>>>=': (x: any) => (variable.value >>>= x),
+      '**=': (x: any) => (variable.value **= x),
+      '|=': (x: any) => (variable.value |= x),
+      '^=': (x: any) => (variable.value ^= x),
+      '&=': (x: any) => (variable.value &= x)
     }[node.operator](evaluate(node.right, scope));
   },
 
@@ -287,14 +253,14 @@ const expressionHandler = {
   CallExpression: (node: ESTree.CallExpression, scope: Scope) => {
     const func = evaluate(node.callee, scope);
     const args = node.arguments.map(arg => evaluate(arg, scope));
-    const thisVal = scope.find('this');
+    const thisVal = getThis(scope);
 
     if (node.callee.type === 'MemberExpression') {
       const object = evaluate(node.callee.object, scope);
       return func.apply(object, args);
     }
 
-    return func.apply(thisVal ? thisVal.get() : null, args);
+    return func.apply(thisVal?.value || null, args);
   },
 
   /** new 表达式 */

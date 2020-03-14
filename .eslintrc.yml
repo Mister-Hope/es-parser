@@ -125,6 +125,10 @@ rules:
   no-ternary:
     - off
 
+  no-underscore-dangle:
+    - error
+    - allowAfterThis: true
+
   no-undefined:
     - off
 

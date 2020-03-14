@@ -5,30 +5,27 @@ export type ScopeType = 'function' | 'loop' | 'switch' | 'block';
 /** 声明类型 */
 export type DeclarationType = 'const' | 'let' | 'var';
 
-/** 变量 */
 export interface Variable {
-  /** 获取变量值 */
-  get(): any;
-  /** 设置变量值 */
-  set(value: any): void;
+  // 变量的值
+  value: any;
 }
 
 /** 作用域变量 */
-export class ScopeVar implements Variable {
+class ScopeVariable implements Variable {
   /** 变量声明类型 */
   private declarationType: DeclarationType;
 
   /** 变量值 */
-  private value: any;
+  private _value: any;
 
   constructor(declarationType: DeclarationType, value: any) {
     this.declarationType = declarationType;
-    this.value = value;
+    this._value = value;
   }
 
   /** 获取作用域变量值 */
-  get() {
-    return this.value;
+  public get value() {
+    return this._value;
   }
 
   /**
@@ -37,12 +34,12 @@ export class ScopeVar implements Variable {
    * @param value
    * @returns 是否设置成功
    */
-  set(value: any) {
+  public set value(value: any) {
     // const 不能二次赋值
     if (this.declarationType === 'const')
       throw new TypeError('Assignment to constant variable.');
 
-    this.value = value;
+    this._value = value;
   }
 }
 
@@ -51,20 +48,24 @@ export class Scope {
   /** 声明的变量 */
   private variables: Record<string, Variable>;
 
+  /** this 指针 */
+  public this: any;
+
   /** 父作用域 */
-  private parent: Scope | null;
+  public parent: Scope | null;
 
   /** 作用域类型 */
-  readonly type: ScopeType;
+  public readonly type: ScopeType;
 
-  constructor(type: ScopeType, parent?: Scope) {
+  constructor(type: ScopeType, parent?: Scope, ctx?: any) {
     this.type = type;
+    this.this = ctx || undefined;
     this.parent = parent || null;
     this.variables = {};
   }
 
   /** 尝试获取变量值 */
-  find(varName: string): Variable | undefined {
+  public find(varName: string): Variable | undefined {
     const name = `@${varName}`;
     // eslint-disable-next-line no-prototype-builtins
     if (this.variables.hasOwnProperty(name)) return this.variables[name];
@@ -74,7 +75,7 @@ export class Scope {
   }
 
   /** 得到变量值 */
-  get(varName: string): Variable {
+  public get(varName: string): Variable {
     const name = `@${varName}`;
     // eslint-disable-next-line no-prototype-builtins
     if (this.variables.hasOwnProperty(name)) return this.variables[name];
@@ -90,14 +91,14 @@ export class Scope {
    * @param value 变量值
    * @returns 声明是否成功
    */
-  let(varName: string, value: any) {
+  public let(varName: string, value: any) {
     const name = `@${varName}`;
     if (this.variables[name])
       throw new SyntaxError(
         `SyntaxError: Identifier '${varName}' has already been declared`
       );
 
-    this.variables[name] = new ScopeVar('let', value);
+    this.variables[name] = new ScopeVariable('let', value);
   }
 
   /**
@@ -107,7 +108,7 @@ export class Scope {
    * @param value 变量值
    * @returns 声明是否成功
    */
-  const(varName: string, value: any) {
+  public const(varName: string, value: any) {
     // `const a;` 这种写法会直接导致 acorn 解析失败
     /*
      * if (arguments.length === 1)
@@ -122,7 +123,7 @@ export class Scope {
         `SyntaxError: Identifier '${varName}' has already been declared`
       );
 
-    this.variables[name] = new ScopeVar('const', value);
+    this.variables[name] = new ScopeVariable('const', value);
   }
 
   /**
@@ -132,7 +133,7 @@ export class Scope {
    * @param value 变量值
    * @returns 声明是否成功
    */
-  var(varName: string, value: any) {
+  public var(varName: string, value: any) {
     const name = `@${varName}`;
 
     // eslint-disable-next-line
@@ -146,7 +147,7 @@ export class Scope {
         `SyntaxWarning: Identifier '${varName}' has already been declared`
       );
 
-    this.variables[name] = new ScopeVar('var', value);
+    this.variables[name] = new ScopeVariable('var', value);
   }
 
   /**
@@ -157,7 +158,11 @@ export class Scope {
    * @param value 变量值
    * @returns 声明是否成功
    */
-  declare(declarationType: DeclarationType, varName: string, value: any) {
+  public declare(
+    declarationType: DeclarationType,
+    varName: string,
+    value: any
+  ) {
     this[declarationType](varName, value);
   }
 }

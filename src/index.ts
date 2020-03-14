@@ -55,9 +55,8 @@ export const run = (
   code: string,
   addtionalGlobalVar: Record<string, any> = {}
 ) => {
-  const scope = new Scope('block');
   // eslint-disable-next-line no-invalid-this
-  scope.const('this', this);
+  const scope = new Scope('block', undefined, this);
 
   // 定义默认全局变量
   for (const name of Object.getOwnPropertyNames(globalVar))
@@ -76,8 +75,7 @@ export const run = (
   evaluate((acorn.parse(code, options) as unknown) as ESTree.Node, scope);
 
   // exports
-  const moduleVar = scope.find('module');
-  return moduleVar ? moduleVar.get().exports : null;
+  return scope.find('module')?.value.exports || null;
 };
 
 export default {

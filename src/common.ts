@@ -16,6 +16,10 @@ export const getLocation = (node: ESTree.Node, type: 'start' | 'end') => {
   return loc ? `${loc.line}:${loc.column}` : '';
 };
 
+/** 获得 this */
+export const getThis = (scope: Scope): any =>
+  scope.this || (scope.parent ? getThis(scope.parent) : null);
+
 /** 获取函数内容 */
 export const getFunction = (
   node: ESTree.BaseFunction,
@@ -24,16 +28,18 @@ export const getFunction = (
 ) =>
   function Function(...args: any[]) {
     /** 函数作用域 */
-    const functionScope = new Scope('function', scope);
+    const functionScope = new Scope(
+      'function',
+      scope,
+      // 普通函数获得当前this，箭头函数获得父级的 this 表达式
+      isArrow ? getThis(scope) : this
+    );
 
     // 在函数作用域内声明函数参数
     node.params.forEach((element, index) => {
       const paramName = (element as ESTree.Identifier).name;
       functionScope.let(paramName, args[index]);
     });
-
-    // 普通函数获得当前this，箭头函数获得父级的 this 表达式
-    functionScope.const('this', isArrow ? scope.find('this') : this);
 
     // 声明 arguments
     functionScope.const('arguments', args);

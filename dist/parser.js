@@ -84,7 +84,7 @@ evaluateMap = Object.assign({
     Identifier: function (node, scope) {
         if (node.name === 'undefined')
             return undefined;
-        return scope.get(node.name).get();
+        return scope.get(node.name).value;
     },
     Literal: function (node, _scope) { return node.value; },
     Program: function (program, scope) {
@@ -97,9 +97,7 @@ evaluateMap = Object.assign({
         for (var _i = 0, _a = node.consequent; _i < _a.length; _i++) {
             var statement = _a[_i];
             var result = evaluate(statement, scope);
-            if (result === common_1.BREAK ||
-                result === common_1.CONTINUE ||
-                result === common_1.RETURN_SINGAL)
+            if (result === common_1.BREAK || result === common_1.CONTINUE || result === common_1.RETURN_SINGAL)
                 return result;
         }
     },
@@ -145,6 +143,9 @@ exports.getLocation = function (node, type) {
     var loc = (_a = node.loc) === null || _a === void 0 ? void 0 : _a[type];
     return loc ? loc.line + ":" + loc.column : '';
 };
+exports.getThis = function (scope) {
+    return scope.this || (scope.parent ? exports.getThis(scope.parent) : null);
+};
 exports.getFunction = function (node, scope, isArrow) {
     if (isArrow === void 0) { isArrow = false; }
     return function Function() {
@@ -152,12 +153,11 @@ exports.getFunction = function (node, scope, isArrow) {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        var functionScope = new scope_1.Scope('function', scope);
+        var functionScope = new scope_1.Scope('function', scope, isArrow ? exports.getThis(scope) : this);
         node.params.forEach(function (element, index) {
             var paramName = element.name;
             functionScope.let(paramName, args[index]);
         });
-        functionScope.const('this', isArrow ? scope.find('this') : this);
         functionScope.const('arguments', args);
         var result = eval_1.default(node.body, functionScope);
         if (result === exports.RETURN_SINGAL)
@@ -173,25 +173,29 @@ exports.getFunction = function (node, scope, isArrow) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ScopeVar = (function () {
-    function ScopeVar(declarationType, value) {
+var ScopeVariable = (function () {
+    function ScopeVariable(declarationType, value) {
         this.declarationType = declarationType;
-        this.value = value;
+        this._value = value;
     }
-    ScopeVar.prototype.get = function () {
-        return this.value;
-    };
-    ScopeVar.prototype.set = function (value) {
-        if (this.declarationType === 'const')
-            throw new TypeError('Assignment to constant variable.');
-        this.value = value;
-    };
-    return ScopeVar;
+    Object.defineProperty(ScopeVariable.prototype, "value", {
+        get: function () {
+            return this._value;
+        },
+        set: function (value) {
+            if (this.declarationType === 'const')
+                throw new TypeError('Assignment to constant variable.');
+            this._value = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return ScopeVariable;
 }());
-exports.ScopeVar = ScopeVar;
 var Scope = (function () {
-    function Scope(type, parent) {
+    function Scope(type, parent, ctx) {
         this.type = type;
+        this.this = ctx || undefined;
         this.parent = parent || null;
         this.variables = {};
     }
@@ -215,13 +219,13 @@ var Scope = (function () {
         var name = "@" + varName;
         if (this.variables[name])
             throw new SyntaxError("SyntaxError: Identifier '" + varName + "' has already been declared");
-        this.variables[name] = new ScopeVar('let', value);
+        this.variables[name] = new ScopeVariable('let', value);
     };
     Scope.prototype.const = function (varName, value) {
         var name = "@" + varName;
         if (this.variables[name])
             throw new SyntaxError("SyntaxError: Identifier '" + varName + "' has already been declared");
-        this.variables[name] = new ScopeVar('const', value);
+        this.variables[name] = new ScopeVariable('const', value);
     };
     Scope.prototype.var = function (varName, value) {
         var name = "@" + varName;
@@ -230,7 +234,7 @@ var Scope = (function () {
             scope = scope.parent;
         if (scope.variables[name])
             console.warn("SyntaxWarning: Identifier '" + varName + "' has already been declared");
-        this.variables[name] = new ScopeVar('var', value);
+        this.variables[name] = new ScopeVariable('var', value);
     };
     Scope.prototype.declare = function (declarationType, varName, value) {
         this[declarationType](varName, value);
@@ -292,14 +296,14 @@ var globalVar = {
 };
 exports.run = function (code, addtionalGlobalVar) {
     if (addtionalGlobalVar === void 0) { addtionalGlobalVar = {}; }
-    var scope = new scope_1.Scope('block');
-    scope.const('this', _this);
-    for (var _i = 0, _a = Object.getOwnPropertyNames(globalVar); _i < _a.length; _i++) {
-        var name_1 = _a[_i];
+    var _a;
+    var scope = new scope_1.Scope('block', undefined, _this);
+    for (var _i = 0, _b = Object.getOwnPropertyNames(globalVar); _i < _b.length; _i++) {
+        var name_1 = _b[_i];
         scope.const(name_1, globalVar[name_1]);
     }
-    for (var _b = 0, _c = Object.getOwnPropertyNames(addtionalGlobalVar); _b < _c.length; _b++) {
-        var name_2 = _c[_b];
+    for (var _c = 0, _d = Object.getOwnPropertyNames(addtionalGlobalVar); _c < _d.length; _c++) {
+        var name_2 = _d[_c];
         scope.const(name_2, addtionalGlobalVar[name_2]);
     }
     var $exports = {};
@@ -307,8 +311,7 @@ exports.run = function (code, addtionalGlobalVar) {
     scope.const('module', $module);
     scope.const('exports', $exports);
     eval_1.default(acorn.parse(code, options), scope);
-    var moduleVar = scope.find('module');
-    return moduleVar ? moduleVar.get().exports : null;
+    return ((_a = scope.find('module')) === null || _a === void 0 ? void 0 : _a.value.exports) || null;
 };
 exports.default = {
     run: exports.run
@@ -5371,12 +5374,11 @@ exports.default = declarationHandler;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var eval_1 = __webpack_require__(0);
 var common_1 = __webpack_require__(1);
+var eval_1 = __webpack_require__(0);
 var expressionHandler = {
     ThisExpression: function (_node, scope) {
-        var result = scope.find('this');
-        return result ? result.get() : null;
+        return common_1.getThis(scope);
     },
     ArrayExpression: function (node, scope) {
         return node.elements.map(function (item) { return eval_1.default(item, scope); });
@@ -5386,13 +5388,13 @@ var expressionHandler = {
         for (var _i = 0, _a = node.properties; _i < _a.length; _i++) {
             var property = _a[_i];
             var kind = property.kind;
-            var key = void 0;
+            var propertyName = void 0;
             switch (property.key.type) {
                 case 'Literal':
-                    key = eval_1.default(property.key, scope);
+                    propertyName = eval_1.default(property.key, scope);
                     break;
                 case 'Identifier':
-                    key = property.key.name;
+                    propertyName = property.key.name;
                     break;
                 default:
                     throw new Error("Can not handle object property in type '" + property.key.type + "'");
@@ -5400,13 +5402,13 @@ var expressionHandler = {
             var value = eval_1.default(property.value, scope);
             switch (kind) {
                 case 'init':
-                    object[key] = value;
+                    object[propertyName] = value;
                     break;
                 case 'get':
-                    Object.defineProperty(object, key, { get: value });
+                    Object.defineProperty(object, propertyName, { get: value });
                     break;
                 case 'set':
-                    Object.defineProperty(object, key, { set: value });
+                    Object.defineProperty(object, propertyName, { set: value });
                     break;
                 default:
             }
@@ -5430,7 +5432,7 @@ var expressionHandler = {
             typeof: function () {
                 if (node.argument.type === 'Identifier') {
                     var variable = scope.find(node.argument.name);
-                    return variable === undefined ? 'undefined' : typeof variable.get();
+                    return variable === undefined ? 'undefined' : typeof variable.value;
                 }
                 return typeof eval_1.default(node.argument, scope);
             },
@@ -5442,10 +5444,8 @@ var expressionHandler = {
                     return delete eval_1.default(object, scope)[property.name];
                 }
                 else if (node.argument.type === 'Identifier') {
-                    var ctx = scope.find('this');
-                    if (ctx)
-                        return ctx.get()[node.argument.name];
-                    return false;
+                    var ctx = common_1.getThis(scope);
+                    return ctx ? ctx.value[node.argument.name] : false;
                 }
                 return false;
             }
@@ -5463,15 +5463,23 @@ var expressionHandler = {
                 ? eval_1.default(argument.property, scope)
                 : argument.property.name;
             variable = {
-                get: function () { return object_1[property_1]; },
-                set: function (value) {
+                get value() {
+                    return object_1[property_1];
+                },
+                set value(value) {
                     object_1[property_1] = value;
                 }
             };
         }
         return {
-            '--': function (x) { return (variable.set(x - 1), prefix ? --x : x--); },
-            '++': function (x) { return (variable.set(x + 1), prefix ? ++x : x++); }
+            '--': function (x) {
+                variable.value = x - 1;
+                return prefix ? --x : x--;
+            },
+            '++': function (x) {
+                variable.value = x + 1;
+                return prefix ? ++x : x++;
+            }
         }[node.operator](eval_1.default(node.argument, scope));
     },
     BinaryExpression: function (node, scope) {
@@ -5511,8 +5519,10 @@ var expressionHandler = {
                 ? eval_1.default(left.property, scope)
                 : left.property.name;
             variable = {
-                get: function () { return object_2[property_2]; },
-                set: function (value) {
+                get value() {
+                    return object_2[property_2];
+                },
+                set value(value) {
                     object_2[property_2] = value;
                 }
             };
@@ -5520,58 +5530,19 @@ var expressionHandler = {
         else
             throw new TypeError("Can not assign to type " + node.left.type);
         return {
-            '=': function (x) {
-                variable.set(x);
-                return x;
-            },
-            '+=': function (x) {
-                variable.set(variable.get() + x);
-                return variable.get();
-            },
-            '-=': function (x) {
-                variable.set(variable.get() - x);
-                return variable.get();
-            },
-            '*=': function (x) {
-                variable.set(variable.get() * x);
-                return variable.get();
-            },
-            '/=': function (x) {
-                variable.set(variable.get() / x);
-                return variable.get();
-            },
-            '%=': function (x) {
-                variable.set(variable.get() % x);
-                return variable.get();
-            },
-            '<<=': function (x) {
-                variable.set(variable.get() << x);
-                return variable.get();
-            },
-            '>>=': function (x) {
-                variable.set(variable.get() >> x);
-                return variable.get();
-            },
-            '>>>=': function (x) {
-                variable.set(variable.get() >>> x);
-                return variable.get();
-            },
-            '**=': function (x) {
-                variable.set(Math.pow(variable.get(), x));
-                return variable.get();
-            },
-            '|=': function (x) {
-                variable.set(variable.get() | x);
-                return variable.get();
-            },
-            '^=': function (x) {
-                variable.set(variable.get() ^ x);
-                return variable.get();
-            },
-            '&=': function (x) {
-                variable.set(variable.get() & x);
-                return variable.get();
-            }
+            '=': function (x) { return (variable.value = x); },
+            '+=': function (x) { return (variable.value += x); },
+            '-=': function (x) { return (variable.value -= x); },
+            '*=': function (x) { return (variable.value *= x); },
+            '/=': function (x) { return (variable.value /= x); },
+            '%=': function (x) { return (variable.value %= x); },
+            '<<=': function (x) { return (variable.value <<= x); },
+            '>>=': function (x) { return (variable.value >>= x); },
+            '>>>=': function (x) { return (variable.value >>>= x); },
+            '**=': function (x) { var _a; return ((_a = variable).value = Math.pow(_a.value, x)); },
+            '|=': function (x) { return (variable.value |= x); },
+            '^=': function (x) { return (variable.value ^= x); },
+            '&=': function (x) { return (variable.value &= x); }
         }[node.operator](eval_1.default(node.right, scope));
     },
     LogicalExpression: function (node, scope) {
@@ -5594,12 +5565,12 @@ var expressionHandler = {
     CallExpression: function (node, scope) {
         var func = eval_1.default(node.callee, scope);
         var args = node.arguments.map(function (arg) { return eval_1.default(arg, scope); });
-        var thisVal = scope.find('this');
+        var thisVal = common_1.getThis(scope);
         if (node.callee.type === 'MemberExpression') {
             var object = eval_1.default(node.callee.object, scope);
             return func.apply(object, args);
         }
-        return func.apply(thisVal ? thisVal.get() : null, args);
+        return func.apply((thisVal === null || thisVal === void 0 ? void 0 : thisVal.value) || null, args);
     },
     NewExpression: function (node, scope) {
         var func = eval_1.default(node.callee, scope);
