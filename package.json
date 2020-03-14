@@ -38,7 +38,7 @@
     "webpack": "^3.11.0"
   },
   "devDependencies": {
-    "@types/chai": "4.2.10",
+    "@types/chai": "4.2.11",
     "@types/estree": "0.0.42",
     "@types/mocha": "7.0.2",
     "@types/node": "13.9.1",
