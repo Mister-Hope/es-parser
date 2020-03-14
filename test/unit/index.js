@@ -36,6 +36,11 @@ describe('declaration test', () => {
       expect(c).to.be.equal(undefined);
       expect(d).to.be.equal(undefined);
     });
+
+    it('var variables is undefined before declaration', () => {
+      expect(a).to.be.equal(undefined);
+      var a;
+    });
   });
 
   describe('let declaration', () => {

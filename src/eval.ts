@@ -49,6 +49,16 @@ evaluateMap = Object.assign(
 
     /** 程序表达式 */
     Program: (program: ESTree.Program, scope: Scope) => {
+      for (const node of program.body)
+        if (node.type === 'VariableDeclaration' && node.kind === 'var')
+          // 依次声明变量
+          node.declarations.forEach(declarator => {
+            /** 变量名称 */
+            const varName = (declarator.id as ESTree.Identifier).name;
+
+            scope.declare('var', varName, undefined);
+          });
+
       // 依次执行每一行，直到有返回值时返回，并停止执行
       for (const node of program.body) evaluate(node, scope);
       // 先执行函数声明

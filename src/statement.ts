@@ -39,6 +39,16 @@ const statementHandler = {
      *   }
      */
 
+    for (const node of block.body)
+      if (node.type === 'VariableDeclaration' && node.kind === 'var')
+        // 依次声明变量
+        node.declarations.forEach(declarator => {
+          /** 变量名称 */
+          const varName = (declarator.id as ESTree.Identifier).name;
+
+          scope.declare('var', varName, undefined);
+        });
+
     // 执行块的主体，并做相应返回
     for (const node of block.body) {
       const result = evaluate(node, blockScope);
