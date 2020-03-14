@@ -6,7 +6,7 @@
   "types": "dist/parser.d.ts",
   "scripts": {
     "dev": "webpack --watch",
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack",
     "test": "mocha -r ts-node/register test/unit/**/*.ts",
     "test:parser": "ts-node ./test/parser.ts",
     "test:dev": "mocha -r ts-node/register  --watch test/unit/**/*.ts",
