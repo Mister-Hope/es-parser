@@ -7,10 +7,12 @@
   "scripts": {
     "dev": "webpack --watch",
     "build": "webpack --config webpack.config.js",
-    "test": "mocha -r ts-node/register test/*.ts",
-    "test:js": "mocha ./test/index.js",
-    "lint": "yarn run lint:check --fix",
-    "lint:check": "eslint src/** test/**",
+    "test": "mocha -r ts-node/register test/unit/**/*.ts",
+    "test:dev": "mocha -r ts-node/register  --watch test/unit/**/*.ts",
+    "test:js": "mocha ./test/unit/index.js",
+    "test:parse": "node ./test/parse.js",
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
     "commit": "npx git-cz"
   },
   "publishConfig": {
@@ -21,8 +23,8 @@
     "url": "git+https://github.com/Mister-Hope/es-parser.git"
   },
   "keywords": [
-    "vuepress-plugin",
-    "comment",
+    "javascript",
+    "parser",
     "mr-hope"
   ],
   "author": "Mr.Hope",

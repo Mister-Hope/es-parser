@@ -18,6 +18,27 @@ const statementHandler = {
     // 需要生成新的块作用域
     const blockScope = new Scope('block', scope);
 
+    // 先执行函数声明
+    /*
+     * for (const node of block.body)
+     *   if (node.type === 'FunctionDeclaration') evaluate(node, scope);
+     */
+
+    // 执行块的主体，并做相应返回
+    /*
+     * for (const node of block.body)
+     *   if (node.type !== 'FunctionDeclaration') {
+     *     const result = evaluate(node, blockScope);
+     *
+     *     if (
+     *       result === BREAK_SINGAL ||
+     *       result === CONTINUE_SINGAL ||
+     *       result === RETURN_SINGAL
+     *     )
+     *       return result;
+     *   }
+     */
+
     // 执行块的主体，并做相应返回
     for (const node of block.body) {
       const result = evaluate(node, blockScope);
@@ -104,7 +125,6 @@ const statementHandler = {
       if (node.handler) {
         const param = node.handler.param as ESTree.Identifier;
         const newScope = new Scope('block', scope);
-        newScope.invasived = true;
         newScope.const(param.name, err);
         return evaluate(node.handler, newScope);
       }
@@ -118,7 +138,6 @@ const statementHandler = {
   WhileStatement: (node: ESTree.WhileStatement, scope: Scope) => {
     while (evaluate(node.test, scope)) {
       const newScope = new Scope('loop', scope);
-      newScope.invasived = true;
       const result = evaluate(node.body, newScope);
 
       if (result === BREAK_SINGAL) break;
@@ -130,7 +149,6 @@ const statementHandler = {
   DoWhileStatement: (node: ESTree.DoWhileStatement, scope: Scope) => {
     do {
       const newScope = new Scope('loop', scope);
-      newScope.invasived = true;
       const result = evaluate(node.body, newScope);
       if (result === BREAK_SINGAL) break;
       else if (result === CONTINUE_SINGAL) continue;
@@ -163,7 +181,6 @@ const statementHandler = {
     for (const value in evaluate(node.right, scope)) {
       const newScope = new Scope('loop', scope);
 
-      newScope.invasived = true;
       scope.declare(kind, name, value);
       const result = evaluate(node.body, newScope);
       if (result === BREAK_SINGAL) break;

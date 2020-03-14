@@ -15,8 +15,6 @@ export const getFuntionExpression = (
     /** 函数作用域 */
     const functionScope = new Scope('function', scope);
 
-    functionScope.invasived = true;
-
     // 在函数作用域内声明函数参数
     node.params.forEach((element, index) => {
       const paramName = (element as ESTree.Identifier).name;

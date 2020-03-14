@@ -3,8 +3,6 @@ root: true
 env:
   es6: true
 
-parser: "@typescript-eslint/parser"
-
 parserOptions:
   ecmaVersion: 6
   project: "./tsconfig.json"
@@ -52,12 +50,10 @@ rules:
     - error
     - min: 2
       exceptions:
-        - a
         - i
         - j
         - x
         - y
-        - T
 
   implicit-arrow-linebreak:
     - off
@@ -172,13 +168,6 @@ rules:
 
 overrides:
   - files:
-      - "test/*.ts"
-
-    env:
-      mocha: true
-      node: true
-
-  - files:
       - "*.ts"
 
     extends:
@@ -196,3 +185,16 @@ overrides:
       #   - allowTypedFunctionExpressions: true
 
       "@typescript-eslint/no-explicit-any": off
+
+  - files:
+      - "test/**"
+
+    env:
+      mocha: true
+      node: true
+
+  - files:
+      - "webpack.config.js"
+
+    env:
+      node: true
