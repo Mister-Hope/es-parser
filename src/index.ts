@@ -10,10 +10,8 @@ const options: acorn.Options = {
   locations: true
 };
 
-declare const Promise: any;
-
 // 导出默认对象
-const defaultApi: { [key: string]: any } = {
+const globalVar: { [key: string]: any } = {
   console,
 
   setTimeout,
@@ -52,16 +50,21 @@ const defaultApi: { [key: string]: any } = {
   Promise
 };
 
-export const run = (code: string, appendApi: { [key: string]: any } = {}) => {
+export const run = (
+  code: string,
+  addtionalGlobalVar: Record<string, any> = {}
+) => {
   const scope = new Scope('block');
   // eslint-disable-next-line no-invalid-this
   scope.const('this', this);
 
-  for (const name of Object.getOwnPropertyNames(defaultApi))
-    scope.const(name, defaultApi[name]);
+  // 定义默认全局变量
+  for (const name of Object.getOwnPropertyNames(globalVar))
+    scope.const(name, globalVar[name]);
 
-  for (const name of Object.getOwnPropertyNames(appendApi))
-    scope.const(name, appendApi[name]);
+  // 定义自定义全局变量
+  for (const name of Object.getOwnPropertyNames(addtionalGlobalVar))
+    scope.const(name, addtionalGlobalVar[name]);
 
   // 定义 module
   const $exports = {};

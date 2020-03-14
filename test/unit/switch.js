@@ -1,6 +1,6 @@
 // @ts-nocheck
 const testSwitch = value => {
-  var temp = 0;
+  let temp = 0;
   switch (value) {
     case 0:
       temp = 6;

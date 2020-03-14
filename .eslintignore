@@ -1,2 +1,3 @@
 dist/parser.js
-test/*.js
+dist/parser.js.map
+test/**/*.js

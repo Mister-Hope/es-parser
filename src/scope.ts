@@ -46,35 +46,6 @@ export class ScopeVar implements Variable {
   }
 }
 
-/** 属性变量 */
-export class PropVariable implements Variable {
-  /** 对象 */
-  object: any;
-
-  /** 属性 */
-  property: string;
-
-  constructor(object: any, property: string) {
-    this.object = object;
-    this.property = property;
-  }
-
-  /** 获得对象属性值 */
-  get() {
-    return this.object[this.property];
-  }
-
-  /** 设置对象属性值 */
-  set(value: any) {
-    this.object[this.property] = value;
-  }
-
-  /** 删除对象属性值 */
-  delete() {
-    delete this.object[this.property];
-  }
-}
-
 /** 作用域 */
 export class Scope {
   /** 声明的变量 */
@@ -86,13 +57,10 @@ export class Scope {
   /** 作用域类型 */
   readonly type: ScopeType;
 
-  invasived: boolean;
-
   constructor(type: ScopeType, parent?: Scope) {
     this.type = type;
     this.parent = parent || null;
     this.variables = {};
-    this.invasived = false;
   }
 
   /** 尝试获取变量值 */
@@ -112,7 +80,7 @@ export class Scope {
     if (this.variables.hasOwnProperty(name)) return this.variables[name];
     else if (this.parent) return this.parent.get(varName);
 
-    throw new ReferenceError(`ReferenceError: ${varName} is not defined`);
+    throw new ReferenceError(`${varName} is not defined`);
   }
 
   /**

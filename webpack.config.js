@@ -4,14 +4,15 @@ module.exports = {
   entry: './src/index.ts',
   output: {
     filename: 'parser.js',
-    path: __dirname + '/dist/',
+    path: `${__dirname}/dist/`,
     libraryTarget: 'commonjs'
   },
   devtool: 'source-map',
   resolve: {
-    extensions: ['.ts', '.js', '.json']
+    extensions: ['.ts', '.js']
+    // extensions: ['.ts', '.js', '.json']
   },
   module: {
-    rules: [{ test: /\.ts$/, loader: 'ts-loader' }]
+    rules: [{ test: /\.ts$/u, loader: 'ts-loader' }]
   }
 };

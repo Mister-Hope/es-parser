@@ -4,65 +4,81 @@ const { expect } = require('chai');
 
 describe('declaration test', () => {
   describe('var declaration', () => {
-    var a;
-
     it('variables can be declared by var', () => {
+      let a;
       expect(a).to.be.equal(undefined);
     });
 
     it('uninited var variables can be assigned', () => {
+      let a;
       a = 1;
       expect(a).to.be.equal(1);
     });
 
-    var b = 1;
-
     it('variables can be declared and inited by var', () => {
+      const b = 1;
       expect(b).to.be.equal(1);
     });
 
     it('var variables can be reassigned', () => {
+      let b = 1;
       b = 2;
       expect(b).to.be.equal(2);
     });
 
     it('muti variables can be declaration in one var statement', () => {
-      var c = 1,
-        d = 2;
-      expect(c).to.be.equal(1);
-      expect(d).to.be.equal(2);
+      const a = 1;
+      const b = 2;
+      let c;
+      let d;
+      expect(a).to.be.equal(1);
+      expect(b).to.be.equal(2);
+      expect(c).to.be.equal(undefined);
+      expect(d).to.be.equal(undefined);
     });
   });
 
   describe('let declaration', () => {
-    {
+    it('variables can be declared by let', () => {
       let a;
-      it('variables can be declared by let', () => {
-        expect(a).to.be.equal(undefined);
-      });
+      expect(a).to.be.equal(undefined);
+    });
 
-      it('uninited let variables can be assigned', () => {
-        a = 1;
-        expect(a).to.be.equal(1);
-      });
-    }
+    it('uninited let variables can be assigned', () => {
+      let a;
+      a = 1;
+      expect(a).to.be.equal(1);
+    });
 
-    let a = 2;
     it("let variable in block scope can't be attached from outside", () => {
-      expect(a).to.be.equal(2);
+      {
+        const a = 1;
+        const b = 1;
+      }
+      const b = 2;
+
+      try {
+        console.log(a);
+      } catch (err) {
+        expect(err.message).to.be.equal('a is not defined');
+      }
+      expect(b).to.be.equal(2);
     });
 
     it('let variables can be reassigned', () => {
-      a = 3;
-      expect(a).to.be.equal(3);
+      let a = 1;
+      a = 2;
+      expect(a).to.be.equal(2);
     });
 
     it('muti variables can be declaration in one let statement', () => {
-      let b = 3,
-        c = 4,
-        d;
-      expect(b).to.be.equal(3);
-      expect(c).to.be.equal(4);
+      const a = 1;
+      const b = 2;
+      let c;
+      let d;
+      expect(a).to.be.equal(1);
+      expect(b).to.be.equal(2);
+      expect(c).to.be.equal(undefined);
       expect(d).to.be.equal(undefined);
     });
   });
@@ -108,8 +124,8 @@ describe('declaration test', () => {
     });
 
     it('muti variables can be declaration in one const statement', () => {
-      const b = 3,
-        c = 4;
+      const b = 3;
+      const c = 4;
       expect(b).to.be.equal(3);
       expect(c).to.be.equal(4);
     });
@@ -117,10 +133,23 @@ describe('declaration test', () => {
 
   it("visiting undefined indetifier should throw error in 'use strict'", () => {
     try {
-      b = 1;
+      console.log(a);
     } catch (err) {
-      expect(err.message).to.be.equal('ReferenceError: b is not defined');
+      expect(err.message).to.be.equal('a is not defined');
     }
+  });
+
+  describe('function declaration', () => {
+    /*
+     * it('should move FunctionDeclaration to the top of the scope', () => {
+     *   let counter = 0;
+     *   hoisted(); // ReferenceError: hoisted is not defined
+     *   function hoisted() {
+     *     counter += 1;
+     *   }
+     *   expect(counter).to.be.equal(1);
+     * });
+     */
   });
 });
 
@@ -187,16 +216,20 @@ describe('identifier test', () => {
     it('transferred string', () => {
       const b = '2\n34\\';
       expect(b).to.be.equal('2\n34\\');
-      //   expect(b).to.be.equal(`2
-      // 34\\`);
+      /*
+       *   expect(b).to.be.equal(`2
+       * 34\\`);
+       */
     });
 
     it('template string', () => {
-      //   const c = `${a}bc${1 + 2 + 3}`;
-      //   const d = `中国
-      // 加油`;
-      // expect(c).to.be.equal('1bc6');
-      // expect(d).to.be.equal('中国\n加油');
+      /*
+       *   const c = `${a}bc${1 + 2 + 3}`;
+       *   const d = `中国
+       * 加油`;
+       * expect(c).to.be.equal('1bc6');
+       * expect(d).to.be.equal('中国\n加油');
+       */
     });
   });
 
@@ -333,7 +366,7 @@ describe('identifier test', () => {
 describe('switch test', () => {
   // @ts-nocheck
   const testSwitch = function(value) {
-    var temp = 0;
+    let temp = 0;
     switch (value) {
       case 0:
         temp = 6;

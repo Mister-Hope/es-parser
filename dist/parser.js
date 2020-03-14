@@ -151,29 +151,11 @@ var ScopeVar = (function () {
     return ScopeVar;
 }());
 exports.ScopeVar = ScopeVar;
-var PropVariable = (function () {
-    function PropVariable(object, property) {
-        this.object = object;
-        this.property = property;
-    }
-    PropVariable.prototype.get = function () {
-        return this.object[this.property];
-    };
-    PropVariable.prototype.set = function (value) {
-        this.object[this.property] = value;
-    };
-    PropVariable.prototype.delete = function () {
-        delete this.object[this.property];
-    };
-    return PropVariable;
-}());
-exports.PropVariable = PropVariable;
 var Scope = (function () {
     function Scope(type, parent) {
         this.type = type;
         this.parent = parent || null;
         this.variables = {};
-        this.invasived = false;
     }
     Scope.prototype.find = function (varName) {
         var name = "@" + varName;
@@ -189,7 +171,7 @@ var Scope = (function () {
             return this.variables[name];
         else if (this.parent)
             return this.parent.get(varName);
-        throw new ReferenceError("ReferenceError: " + varName + " is not defined");
+        throw new ReferenceError(varName + " is not defined");
     };
     Scope.prototype.let = function (varName, value) {
         var name = "@" + varName;
@@ -250,7 +232,6 @@ exports.getFuntionExpression = function (node, scope, isArrow) {
             args[_i] = arguments[_i];
         }
         var functionScope = new scope_1.Scope('function', scope);
-        functionScope.invasived = true;
         node.params.forEach(function (element, index) {
             var paramName = element.name;
             functionScope.let(paramName, args[index]);
@@ -538,7 +519,7 @@ var options = {
     sourceType: 'script',
     locations: true
 };
-var defaultApi = {
+var globalVar = {
     console: console,
     setTimeout: setTimeout,
     setInterval: setInterval,
@@ -571,17 +552,17 @@ var defaultApi = {
     JSON: JSON,
     Promise: Promise
 };
-exports.run = function (code, appendApi) {
-    if (appendApi === void 0) { appendApi = {}; }
+exports.run = function (code, addtionalGlobalVar) {
+    if (addtionalGlobalVar === void 0) { addtionalGlobalVar = {}; }
     var scope = new scope_1.Scope('block');
     scope.const('this', _this);
-    for (var _i = 0, _a = Object.getOwnPropertyNames(defaultApi); _i < _a.length; _i++) {
+    for (var _i = 0, _a = Object.getOwnPropertyNames(globalVar); _i < _a.length; _i++) {
         var name_1 = _a[_i];
-        scope.const(name_1, defaultApi[name_1]);
+        scope.const(name_1, globalVar[name_1]);
     }
-    for (var _b = 0, _c = Object.getOwnPropertyNames(appendApi); _b < _c.length; _b++) {
+    for (var _b = 0, _c = Object.getOwnPropertyNames(addtionalGlobalVar); _b < _c.length; _b++) {
         var name_2 = _c[_b];
-        scope.const(name_2, appendApi[name_2]);
+        scope.const(name_2, addtionalGlobalVar[name_2]);
     }
     var $exports = {};
     var $module = { exports: $exports };
@@ -5791,7 +5772,6 @@ var statementHandler = {
             if (node.handler) {
                 var param = node.handler.param;
                 var newScope = new scope_1.Scope('block', scope);
-                newScope.invasived = true;
                 newScope.const(param.name, err);
                 return eval_1.default(node.handler, newScope);
             }
@@ -5805,7 +5785,6 @@ var statementHandler = {
     WhileStatement: function (node, scope) {
         while (eval_1.default(node.test, scope)) {
             var newScope = new scope_1.Scope('loop', scope);
-            newScope.invasived = true;
             var result = eval_1.default(node.body, newScope);
             if (result === signal_1.BREAK_SINGAL)
                 break;
@@ -5818,7 +5797,6 @@ var statementHandler = {
     DoWhileStatement: function (node, scope) {
         do {
             var newScope = new scope_1.Scope('loop', scope);
-            newScope.invasived = true;
             var result = eval_1.default(node.body, newScope);
             if (result === signal_1.BREAK_SINGAL)
                 break;
@@ -5845,7 +5823,6 @@ var statementHandler = {
         var name = decl.id.name;
         for (var value in eval_1.default(node.right, scope)) {
             var newScope = new scope_1.Scope('loop', scope);
-            newScope.invasived = true;
             scope.declare(kind, name, value);
             var result = eval_1.default(node.body, newScope);
             if (result === signal_1.BREAK_SINGAL)

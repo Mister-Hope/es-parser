@@ -51,6 +51,13 @@ evaluateMap = Object.assign(
     Program: (program: ESTree.Program, scope: Scope) => {
       // 依次执行每一行，直到有返回值时返回，并停止执行
       for (const node of program.body) evaluate(node, scope);
+      // // 先执行函数声明
+      // for (const node of program.body)
+      //   if (node.type === 'FunctionDeclaration') evaluate(node, scope);
+
+      // // 依次执行每一行
+      // for (const node of program.body)
+      //   if (node.type !== 'FunctionDeclaration') evaluate(node, scope);
     },
 
     /** switch 中的 case 表达式 */

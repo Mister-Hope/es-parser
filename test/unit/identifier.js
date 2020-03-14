@@ -61,16 +61,20 @@ describe('String test', () => {
   it('transferred string', () => {
     const b = '2\n34\\';
     expect(b).to.be.equal('2\n34\\');
-    //   expect(b).to.be.equal(`2
-    // 34\\`);
+    /*
+     *   expect(b).to.be.equal(`2
+     * 34\\`);
+     */
   });
 
   it('template string', () => {
-    //   const c = `${a}bc${1 + 2 + 3}`;
-    //   const d = `中国
-    // 加油`;
-    // expect(c).to.be.equal('1bc6');
-    // expect(d).to.be.equal('中国\n加油');
+    /*
+     *   const c = `${a}bc${1 + 2 + 3}`;
+     *   const d = `中国
+     * 加油`;
+     * expect(c).to.be.equal('1bc6');
+     * expect(d).to.be.equal('中国\n加油');
+     */
   });
 });
 
