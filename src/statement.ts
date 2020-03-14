@@ -2,7 +2,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable consistent-return */
 import * as ESTree from 'estree';
-import { BREAK_SINGAL, CONTINUE_SINGAL, RETURN_SINGAL } from './signal';
+import { BREAK, CONTINUE, RETURN_SINGAL } from './common';
 import { Scope } from './scope';
 import evaluate from './eval';
 
@@ -43,11 +43,7 @@ const statementHandler = {
     for (const node of block.body) {
       const result = evaluate(node, blockScope);
 
-      if (
-        result === BREAK_SINGAL ||
-        result === CONTINUE_SINGAL ||
-        result === RETURN_SINGAL
-      )
+      if (result === BREAK || result === CONTINUE || result === RETURN_SINGAL)
         return result;
     }
   },
@@ -78,13 +74,10 @@ const statementHandler = {
     // throw new Error(`${node.type} 未实现`);
   },
 
-  BreakStatement: (_node: ESTree.BreakStatement, _scope: Scope) => {
-    return BREAK_SINGAL;
-  },
+  BreakStatement: (_node: ESTree.BreakStatement, _scope: Scope) => BREAK,
 
-  ContinueStatement: (_node: ESTree.ContinueStatement, _scope: Scope) => {
-    return CONTINUE_SINGAL;
-  },
+  ContinueStatement: (_node: ESTree.ContinueStatement, _scope: Scope) =>
+    CONTINUE,
 
   IfStatement: (node: ESTree.IfStatement, scope: Scope) => {
     if (evaluate(node.test, scope)) return evaluate(node.consequent, scope);
@@ -107,9 +100,8 @@ const statementHandler = {
       if (matched) {
         const result = evaluate($case, newScope);
 
-        if (result === BREAK_SINGAL) break;
-        else if (result === CONTINUE_SINGAL || result === RETURN_SINGAL)
-          return result;
+        if (result === BREAK) break;
+        else if (result === CONTINUE || result === RETURN_SINGAL) return result;
       }
     }
   },
@@ -140,8 +132,8 @@ const statementHandler = {
       const newScope = new Scope('loop', scope);
       const result = evaluate(node.body, newScope);
 
-      if (result === BREAK_SINGAL) break;
-      else if (result === CONTINUE_SINGAL) continue;
+      if (result === BREAK) break;
+      else if (result === CONTINUE) continue;
       else if (result === RETURN_SINGAL) return result;
     }
   },
@@ -150,8 +142,8 @@ const statementHandler = {
     do {
       const newScope = new Scope('loop', scope);
       const result = evaluate(node.body, newScope);
-      if (result === BREAK_SINGAL) break;
-      else if (result === CONTINUE_SINGAL) continue;
+      if (result === BREAK) break;
+      else if (result === CONTINUE) continue;
       else if (result === RETURN_SINGAL) return result;
     } while (evaluate(node.test, scope));
   },
@@ -166,8 +158,8 @@ const statementHandler = {
       node.update ? evaluate(node.update, newScope) : void 0
     ) {
       const result = evaluate(node.body, newScope);
-      if (result === BREAK_SINGAL) break;
-      else if (result === CONTINUE_SINGAL) continue;
+      if (result === BREAK) break;
+      else if (result === CONTINUE) continue;
       else if (result === RETURN_SINGAL) return result;
     }
   },
@@ -183,8 +175,8 @@ const statementHandler = {
 
       scope.declare(kind, name, value);
       const result = evaluate(node.body, newScope);
-      if (result === BREAK_SINGAL) break;
-      else if (result === CONTINUE_SINGAL) continue;
+      if (result === BREAK) break;
+      else if (result === CONTINUE) continue;
       else if (result === RETURN_SINGAL) return result;
     }
   },

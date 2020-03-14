@@ -2,28 +2,29 @@
 import * as ESTree from 'estree';
 import { Scope } from './scope';
 import evaluate from './eval';
-import { getFuntionExpression } from './expression';
+import { getFunction } from './common';
 
+/** 声明处理 */
 const declarationHandler = {
   /** 变量声明 */
   VariableDeclaration: (node: ESTree.VariableDeclaration, scope: Scope) => {
     // 依次声明变量
-    for (const declartor of node.declarations) {
+    node.declarations.forEach(declarator => {
       /** 变量名称 */
-      const varName = (declartor.id as ESTree.Identifier).name;
+      const varName = (declarator.id as ESTree.Identifier).name;
       /** 变量值 */
-      const value = declartor.init
-        ? evaluate(declartor.init, scope)
+      const value = declarator.init
+        ? evaluate(declarator.init, scope)
         : undefined;
 
       scope.declare(node.kind, varName, value);
-    }
+    });
   },
 
   /** 函数声明 */
   FunctionDeclaration: (node: ESTree.FunctionDeclaration, scope: Scope) => {
     // `export default function` 时为 `null`
-    if (node.id) scope.const(node.id.name, getFuntionExpression(node, scope));
+    if (node.id) scope.const(node.id.name, getFunction(node, scope));
   },
 
   /** 类声明 */

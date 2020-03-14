@@ -140,16 +140,14 @@ describe('declaration test', () => {
   });
 
   describe('function declaration', () => {
-    /*
-     * it('should move FunctionDeclaration to the top of the scope', () => {
-     *   let counter = 0;
-     *   hoisted(); // ReferenceError: hoisted is not defined
-     *   function hoisted() {
-     *     counter += 1;
-     *   }
-     *   expect(counter).to.be.equal(1);
-     * });
-     */
+    it('should move FunctionDeclaration to the top of the scope', () => {
+      let counter = 0;
+      hoisted(); // ReferenceError: hoisted is not defined
+      function hoisted() {
+        counter += 1;
+      }
+      expect(counter).to.be.equal(1);
+    });
   });
 });
 

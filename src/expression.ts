@@ -2,37 +2,8 @@
 /* eslint-disable no-bitwise */
 import * as ESTree from 'estree';
 import { Scope, Variable } from './scope';
-import { RETURN_SINGAL } from './signal';
 import evaluate from './eval';
-
-/** 获取函数体 */
-export const getFuntionExpression = (
-  node: ESTree.BaseFunction,
-  scope: Scope,
-  isArrow = false
-) =>
-  function Function(...args: any[]) {
-    /** 函数作用域 */
-    const functionScope = new Scope('function', scope);
-
-    // 在函数作用域内声明函数参数
-    node.params.forEach((element, index) => {
-      const paramName = (element as ESTree.Identifier).name;
-      functionScope.let(paramName, args[index]);
-    });
-
-    // 普通函数获得当前this，箭头函数获得父级的 this 表达式
-    functionScope.const('this', isArrow ? scope.find('this') : this);
-
-    // 声明 arguments
-    functionScope.const('arguments', args);
-
-    // 执行函数
-    const result = evaluate(node.body, functionScope);
-
-    // 如果存在返回值，则返回
-    if (result === RETURN_SINGAL) return result.result;
-  };
+import { getFunction } from './common';
 
 const expressionHandler = {
   /** `this` 表达式 */
@@ -97,13 +68,13 @@ const expressionHandler = {
 
   /** 函数表达式 */
   FunctionExpression: (node: ESTree.FunctionExpression, scope: Scope) =>
-    getFuntionExpression(node, scope),
+    getFunction(node, scope),
 
   /** 箭头函数表达式 */
   ArrowFunctionExpression: (
     node: ESTree.ArrowFunctionExpression,
     scope: Scope
-  ) => getFuntionExpression(node, scope, true),
+  ) => getFunction(node, scope, true),
 
   /** yield 表达式 */
   YieldExpression: (_node: ESTree.YieldExpression, _scope: Scope) => {
@@ -214,21 +185,26 @@ const expressionHandler = {
   AssignmentExpression: (node: ESTree.AssignmentExpression, scope: Scope) => {
     let variable: Variable;
 
+    // 普通标识符
     if (node.left.type === 'Identifier') variable = scope.get(node.left.name);
+    // 成员表达式
     else if (node.left.type === 'MemberExpression') {
       const { left } = node;
+      // 获取到所在对象
       const object = evaluate(left.object, scope);
+      // 获取对应的属性名称
       const property = left.computed
         ? evaluate(left.property, scope)
         : (left.property as ESTree.Identifier).name;
 
+      // 生成变量对象
       variable = {
         get: () => object[property],
         set(value: any) {
           object[property] = value;
         }
       };
-    } else throw new Error('出现问题');
+    } else throw new TypeError(`Can not assign to type ${node.left.type}`);
 
     return {
       '=': (x: any) => {

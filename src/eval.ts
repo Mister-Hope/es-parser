@@ -2,7 +2,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable consistent-return */
 import * as ESTree from 'estree';
-import { BREAK_SINGAL, CONTINUE_SINGAL, RETURN_SINGAL } from './signal';
+import { BREAK, CONTINUE, RETURN_SINGAL } from './common';
 import { EvaluateFunc, EvaluateMap } from './type';
 import { Scope } from './scope';
 import declarationHandler from './declaration';
@@ -67,8 +67,8 @@ evaluateMap = Object.assign(
         const result = evaluate(statement, scope);
         // 执行停止并返回相应状态
         if (
-          result === BREAK_SINGAL ||
-          result === CONTINUE_SINGAL ||
+          result === BREAK ||
+          result === CONTINUE ||
           result === RETURN_SINGAL
         )
           return result;

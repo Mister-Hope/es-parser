@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -70,9 +70,9 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var signal_1 = __webpack_require__(2);
-var declaration_1 = __webpack_require__(6);
-var expression_1 = __webpack_require__(3);
+var common_1 = __webpack_require__(1);
+var declaration_1 = __webpack_require__(5);
+var expression_1 = __webpack_require__(6);
 var module_1 = __webpack_require__(7);
 var pattern_1 = __webpack_require__(8);
 var statement_1 = __webpack_require__(9);
@@ -97,9 +97,9 @@ evaluateMap = Object.assign({
         for (var _i = 0, _a = node.consequent; _i < _a.length; _i++) {
             var statement = _a[_i];
             var result = evaluate(statement, scope);
-            if (result === signal_1.BREAK_SINGAL ||
-                result === signal_1.CONTINUE_SINGAL ||
-                result === signal_1.RETURN_SINGAL)
+            if (result === common_1.BREAK ||
+                result === common_1.CONTINUE ||
+                result === common_1.RETURN_SINGAL)
                 return result;
         }
     },
@@ -130,6 +130,44 @@ exports.default = evaluate;
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var scope_1 = __webpack_require__(2);
+var eval_1 = __webpack_require__(0);
+exports.BREAK = Symbol('BREAK');
+exports.CONTINUE = Symbol('CONTINUE');
+exports.RETURN_SINGAL = { result: undefined };
+exports.getLocation = function (node, type) {
+    var _a;
+    var loc = (_a = node.loc) === null || _a === void 0 ? void 0 : _a[type];
+    return loc ? loc.line + ":" + loc.column : '';
+};
+exports.getFunction = function (node, scope, isArrow) {
+    if (isArrow === void 0) { isArrow = false; }
+    return function Function() {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var functionScope = new scope_1.Scope('function', scope);
+        node.params.forEach(function (element, index) {
+            var paramName = element.name;
+            functionScope.let(paramName, args[index]);
+        });
+        functionScope.const('this', isArrow ? scope.find('this') : this);
+        functionScope.const('arguments', args);
+        var result = eval_1.default(node.body, functionScope);
+        if (result === exports.RETURN_SINGAL)
+            return result.result;
+    };
+};
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -203,316 +241,15 @@ exports.Scope = Scope;
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.BREAK_SINGAL = {};
-exports.CONTINUE_SINGAL = {};
-exports.RETURN_SINGAL = { result: undefined };
-
-
-/***/ }),
 /* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var scope_1 = __webpack_require__(1);
-var signal_1 = __webpack_require__(2);
-var eval_1 = __webpack_require__(0);
-exports.getFuntionExpression = function (node, scope, isArrow) {
-    if (isArrow === void 0) { isArrow = false; }
-    return function Function() {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i] = arguments[_i];
-        }
-        var functionScope = new scope_1.Scope('function', scope);
-        node.params.forEach(function (element, index) {
-            var paramName = element.name;
-            functionScope.let(paramName, args[index]);
-        });
-        functionScope.const('this', isArrow ? scope.find('this') : this);
-        functionScope.const('arguments', args);
-        var result = eval_1.default(node.body, functionScope);
-        if (result === signal_1.RETURN_SINGAL)
-            return result.result;
-    };
-};
-var expressionHandler = {
-    ThisExpression: function (_node, scope) {
-        var result = scope.find('this');
-        return result ? result.get() : null;
-    },
-    ArrayExpression: function (node, scope) {
-        return node.elements.map(function (item) { return eval_1.default(item, scope); });
-    },
-    ObjectExpression: function (node, scope) {
-        var object = {};
-        for (var _i = 0, _a = node.properties; _i < _a.length; _i++) {
-            var property = _a[_i];
-            var kind = property.kind;
-            var key = void 0;
-            switch (property.key.type) {
-                case 'Literal':
-                    key = eval_1.default(property.key, scope);
-                    break;
-                case 'Identifier':
-                    key = property.key.name;
-                    break;
-                default:
-                    throw new Error("Can not handle object property in type '" + property.key.type + "'");
-            }
-            var value = eval_1.default(property.value, scope);
-            switch (kind) {
-                case 'init':
-                    object[key] = value;
-                    break;
-                case 'get':
-                    Object.defineProperty(object, key, { get: value });
-                    break;
-                case 'set':
-                    Object.defineProperty(object, key, { set: value });
-                    break;
-                default:
-            }
-        }
-        return object;
-    },
-    FunctionExpression: function (node, scope) {
-        return exports.getFuntionExpression(node, scope);
-    },
-    ArrowFunctionExpression: function (node, scope) { return exports.getFuntionExpression(node, scope, true); },
-    YieldExpression: function (_node, _scope) {
-        throw new Error('yield not supported in Wechat Miniprogram');
-    },
-    UnaryExpression: function (node, scope) {
-        return ({
-            '-': function () { return -eval_1.default(node.argument, scope); },
-            '+': function () { return Number(eval_1.default(node.argument, scope)); },
-            '!': function () { return !eval_1.default(node.argument, scope); },
-            '~': function () { return ~eval_1.default(node.argument, scope); },
-            void: function () { return void eval_1.default(node.argument, scope); },
-            typeof: function () {
-                if (node.argument.type === 'Identifier') {
-                    var variable = scope.find(node.argument.name);
-                    return variable === undefined ? 'undefined' : typeof variable.get();
-                }
-                return typeof eval_1.default(node.argument, scope);
-            },
-            delete: function () {
-                if (node.argument.type === 'MemberExpression') {
-                    var _a = node.argument, object = _a.object, property = _a.property, computed = _a.computed;
-                    if (computed)
-                        return delete eval_1.default(object, scope)[eval_1.default(property, scope)];
-                    return delete eval_1.default(object, scope)[property.name];
-                }
-                else if (node.argument.type === 'Identifier') {
-                    var ctx = scope.find('this');
-                    if (ctx)
-                        return ctx.get()[node.argument.name];
-                    return false;
-                }
-                return false;
-            }
-        }[node.operator]());
-    },
-    UpdateExpression: function (node, scope) {
-        var prefix = node.prefix;
-        var variable;
-        if (node.argument.type === 'Identifier')
-            variable = scope.get(node.argument.name);
-        else if (node.argument.type === 'MemberExpression') {
-            var argument = node.argument;
-            var object_1 = eval_1.default(argument.object, scope);
-            var property_1 = argument.computed
-                ? eval_1.default(argument.property, scope)
-                : argument.property.name;
-            variable = {
-                get: function () { return object_1[property_1]; },
-                set: function (value) {
-                    object_1[property_1] = value;
-                }
-            };
-        }
-        return {
-            '--': function (x) { return (variable.set(x - 1), prefix ? --x : x--); },
-            '++': function (x) { return (variable.set(x + 1), prefix ? ++x : x++); }
-        }[node.operator](eval_1.default(node.argument, scope));
-    },
-    BinaryExpression: function (node, scope) {
-        return ({
-            '==': function (x, y) { return x == y; },
-            '!=': function (x, y) { return x != y; },
-            '===': function (x, y) { return x === y; },
-            '!==': function (x, y) { return x !== y; },
-            '<': function (x, y) { return x < y; },
-            '<=': function (x, y) { return x <= y; },
-            '>': function (x, y) { return x > y; },
-            '>=': function (x, y) { return x >= y; },
-            '<<': function (x, y) { return x << y; },
-            '>>': function (x, y) { return x >> y; },
-            '>>>': function (x, y) { return x >>> y; },
-            '+': function (x, y) { return x + y; },
-            '-': function (x, y) { return x - y; },
-            '*': function (x, y) { return x * y; },
-            '**': function (x, y) { return Math.pow(x, y); },
-            '/': function (x, y) { return x / y; },
-            '%': function (x, y) { return x % y; },
-            '|': function (x, y) { return x | y; },
-            '^': function (x, y) { return x ^ y; },
-            '&': function (x, y) { return x & y; },
-            in: function (x, y) { return x in y; },
-            instanceof: function (x, y) { return x instanceof y; }
-        }[node.operator](eval_1.default(node.left, scope), eval_1.default(node.right, scope)));
-    },
-    AssignmentExpression: function (node, scope) {
-        var variable;
-        if (node.left.type === 'Identifier')
-            variable = scope.get(node.left.name);
-        else if (node.left.type === 'MemberExpression') {
-            var left = node.left;
-            var object_2 = eval_1.default(left.object, scope);
-            var property_2 = left.computed
-                ? eval_1.default(left.property, scope)
-                : left.property.name;
-            variable = {
-                get: function () { return object_2[property_2]; },
-                set: function (value) {
-                    object_2[property_2] = value;
-                }
-            };
-        }
-        else
-            throw new Error('出现问题');
-        return {
-            '=': function (x) {
-                variable.set(x);
-                return x;
-            },
-            '+=': function (x) {
-                variable.set(variable.get() + x);
-                return variable.get();
-            },
-            '-=': function (x) {
-                variable.set(variable.get() - x);
-                return variable.get();
-            },
-            '*=': function (x) {
-                variable.set(variable.get() * x);
-                return variable.get();
-            },
-            '/=': function (x) {
-                variable.set(variable.get() / x);
-                return variable.get();
-            },
-            '%=': function (x) {
-                variable.set(variable.get() % x);
-                return variable.get();
-            },
-            '<<=': function (x) {
-                variable.set(variable.get() << x);
-                return variable.get();
-            },
-            '>>=': function (x) {
-                variable.set(variable.get() >> x);
-                return variable.get();
-            },
-            '>>>=': function (x) {
-                variable.set(variable.get() >>> x);
-                return variable.get();
-            },
-            '**=': function (x) {
-                variable.set(Math.pow(variable.get(), x));
-                return variable.get();
-            },
-            '|=': function (x) {
-                variable.set(variable.get() | x);
-                return variable.get();
-            },
-            '^=': function (x) {
-                variable.set(variable.get() ^ x);
-                return variable.get();
-            },
-            '&=': function (x) {
-                variable.set(variable.get() & x);
-                return variable.get();
-            }
-        }[node.operator](eval_1.default(node.right, scope));
-    },
-    LogicalExpression: function (node, scope) {
-        return ({
-            '||': function () { return eval_1.default(node.left, scope) || eval_1.default(node.right, scope); },
-            '&&': function () { return eval_1.default(node.left, scope) && eval_1.default(node.right, scope); }
-        }[node.operator]());
-    },
-    MemberExpression: function (node, scope) {
-        var object = node.object, property = node.property, computed = node.computed;
-        if (computed)
-            return eval_1.default(object, scope)[eval_1.default(property, scope)];
-        return eval_1.default(object, scope)[property.name];
-    },
-    ConditionalExpression: function (node, scope) {
-        return eval_1.default(node.test, scope)
-            ? eval_1.default(node.consequent, scope)
-            : eval_1.default(node.alternate, scope);
-    },
-    CallExpression: function (node, scope) {
-        var func = eval_1.default(node.callee, scope);
-        var args = node.arguments.map(function (arg) { return eval_1.default(arg, scope); });
-        var thisVal = scope.find('this');
-        if (node.callee.type === 'MemberExpression') {
-            var object = eval_1.default(node.callee.object, scope);
-            return func.apply(object, args);
-        }
-        return func.apply(thisVal ? thisVal.get() : null, args);
-    },
-    NewExpression: function (node, scope) {
-        var func = eval_1.default(node.callee, scope);
-        var args = node.arguments.map(function (arg) { return eval_1.default(arg, scope); });
-        return new (func.bind.apply(func, [null].concat(args)))();
-    },
-    SequenceExpression: function (node, scope) {
-        var last;
-        for (var _i = 0, _a = node.expressions; _i < _a.length; _i++) {
-            var expr = _a[_i];
-            last = eval_1.default(expr, scope);
-        }
-        return last;
-    },
-    TemplateLiteral: function (node, _scope) {
-        throw new Error(node.type + " \u672A\u5B9E\u73B0");
-    },
-    TaggedTemplateExpression: function (node, _scope) {
-        throw new Error(node.type + " \u672A\u5B9E\u73B0");
-    },
-    ClassExpression: function (_node, _scope) {
-        throw new Error('class not supported in Wechat Miniprogram');
-    },
-    MetaProperty: function (node, _scope) {
-        throw new Error(node.type + " \u672A\u5B9E\u73B0");
-    },
-    AwaitExpression: function (_node, _scope) {
-        throw new Error('await not supported in Wechat Miniprogram');
-    }
-};
-exports.default = expressionHandler;
-
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
-var acorn = __webpack_require__(5);
-var scope_1 = __webpack_require__(1);
+var acorn = __webpack_require__(4);
+var scope_1 = __webpack_require__(2);
 var eval_1 = __webpack_require__(0);
 var options = {
     ecmaVersion: 6,
@@ -540,6 +277,7 @@ var globalVar = {
     SyntaxError: SyntaxError,
     TypeError: TypeError,
     URIError: URIError,
+    Symbol: Symbol,
     Object: Object,
     Boolean: Boolean,
     Function: Function,
@@ -578,7 +316,7 @@ exports.default = {
 
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5597,6 +5335,36 @@ function tokenizer(input, options) {
 
 
 /***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var eval_1 = __webpack_require__(0);
+var common_1 = __webpack_require__(1);
+var declarationHandler = {
+    VariableDeclaration: function (node, scope) {
+        node.declarations.forEach(function (declarator) {
+            var varName = declarator.id.name;
+            var value = declarator.init
+                ? eval_1.default(declarator.init, scope)
+                : undefined;
+            scope.declare(node.kind, varName, value);
+        });
+    },
+    FunctionDeclaration: function (node, scope) {
+        if (node.id)
+            scope.const(node.id.name, common_1.getFunction(node, scope));
+    },
+    ClassDeclaration: function (_node, _scope) {
+        throw new Error('Class not supported in Wechat Miniprogram');
+    }
+};
+exports.default = declarationHandler;
+
+
+/***/ }),
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5604,27 +5372,265 @@ function tokenizer(input, options) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var eval_1 = __webpack_require__(0);
-var expression_1 = __webpack_require__(3);
-var declarationHandler = {
-    VariableDeclaration: function (node, scope) {
-        for (var _i = 0, _a = node.declarations; _i < _a.length; _i++) {
-            var declartor = _a[_i];
-            var varName = declartor.id.name;
-            var value = declartor.init
-                ? eval_1.default(declartor.init, scope)
-                : undefined;
-            scope.declare(node.kind, varName, value);
+var common_1 = __webpack_require__(1);
+var expressionHandler = {
+    ThisExpression: function (_node, scope) {
+        var result = scope.find('this');
+        return result ? result.get() : null;
+    },
+    ArrayExpression: function (node, scope) {
+        return node.elements.map(function (item) { return eval_1.default(item, scope); });
+    },
+    ObjectExpression: function (node, scope) {
+        var object = {};
+        for (var _i = 0, _a = node.properties; _i < _a.length; _i++) {
+            var property = _a[_i];
+            var kind = property.kind;
+            var key = void 0;
+            switch (property.key.type) {
+                case 'Literal':
+                    key = eval_1.default(property.key, scope);
+                    break;
+                case 'Identifier':
+                    key = property.key.name;
+                    break;
+                default:
+                    throw new Error("Can not handle object property in type '" + property.key.type + "'");
+            }
+            var value = eval_1.default(property.value, scope);
+            switch (kind) {
+                case 'init':
+                    object[key] = value;
+                    break;
+                case 'get':
+                    Object.defineProperty(object, key, { get: value });
+                    break;
+                case 'set':
+                    Object.defineProperty(object, key, { set: value });
+                    break;
+                default:
+            }
         }
+        return object;
     },
-    FunctionDeclaration: function (node, scope) {
-        if (node.id)
-            scope.const(node.id.name, expression_1.getFuntionExpression(node, scope));
+    FunctionExpression: function (node, scope) {
+        return common_1.getFunction(node, scope);
     },
-    ClassDeclaration: function (_node, _scope) {
-        throw new Error('Class not supported in Wechat Miniprogram');
+    ArrowFunctionExpression: function (node, scope) { return common_1.getFunction(node, scope, true); },
+    YieldExpression: function (_node, _scope) {
+        throw new Error('yield not supported in Wechat Miniprogram');
+    },
+    UnaryExpression: function (node, scope) {
+        return ({
+            '-': function () { return -eval_1.default(node.argument, scope); },
+            '+': function () { return Number(eval_1.default(node.argument, scope)); },
+            '!': function () { return !eval_1.default(node.argument, scope); },
+            '~': function () { return ~eval_1.default(node.argument, scope); },
+            void: function () { return void eval_1.default(node.argument, scope); },
+            typeof: function () {
+                if (node.argument.type === 'Identifier') {
+                    var variable = scope.find(node.argument.name);
+                    return variable === undefined ? 'undefined' : typeof variable.get();
+                }
+                return typeof eval_1.default(node.argument, scope);
+            },
+            delete: function () {
+                if (node.argument.type === 'MemberExpression') {
+                    var _a = node.argument, object = _a.object, property = _a.property, computed = _a.computed;
+                    if (computed)
+                        return delete eval_1.default(object, scope)[eval_1.default(property, scope)];
+                    return delete eval_1.default(object, scope)[property.name];
+                }
+                else if (node.argument.type === 'Identifier') {
+                    var ctx = scope.find('this');
+                    if (ctx)
+                        return ctx.get()[node.argument.name];
+                    return false;
+                }
+                return false;
+            }
+        }[node.operator]());
+    },
+    UpdateExpression: function (node, scope) {
+        var prefix = node.prefix;
+        var variable;
+        if (node.argument.type === 'Identifier')
+            variable = scope.get(node.argument.name);
+        else if (node.argument.type === 'MemberExpression') {
+            var argument = node.argument;
+            var object_1 = eval_1.default(argument.object, scope);
+            var property_1 = argument.computed
+                ? eval_1.default(argument.property, scope)
+                : argument.property.name;
+            variable = {
+                get: function () { return object_1[property_1]; },
+                set: function (value) {
+                    object_1[property_1] = value;
+                }
+            };
+        }
+        return {
+            '--': function (x) { return (variable.set(x - 1), prefix ? --x : x--); },
+            '++': function (x) { return (variable.set(x + 1), prefix ? ++x : x++); }
+        }[node.operator](eval_1.default(node.argument, scope));
+    },
+    BinaryExpression: function (node, scope) {
+        return ({
+            '==': function (x, y) { return x == y; },
+            '!=': function (x, y) { return x != y; },
+            '===': function (x, y) { return x === y; },
+            '!==': function (x, y) { return x !== y; },
+            '<': function (x, y) { return x < y; },
+            '<=': function (x, y) { return x <= y; },
+            '>': function (x, y) { return x > y; },
+            '>=': function (x, y) { return x >= y; },
+            '<<': function (x, y) { return x << y; },
+            '>>': function (x, y) { return x >> y; },
+            '>>>': function (x, y) { return x >>> y; },
+            '+': function (x, y) { return x + y; },
+            '-': function (x, y) { return x - y; },
+            '*': function (x, y) { return x * y; },
+            '**': function (x, y) { return Math.pow(x, y); },
+            '/': function (x, y) { return x / y; },
+            '%': function (x, y) { return x % y; },
+            '|': function (x, y) { return x | y; },
+            '^': function (x, y) { return x ^ y; },
+            '&': function (x, y) { return x & y; },
+            in: function (x, y) { return x in y; },
+            instanceof: function (x, y) { return x instanceof y; }
+        }[node.operator](eval_1.default(node.left, scope), eval_1.default(node.right, scope)));
+    },
+    AssignmentExpression: function (node, scope) {
+        var variable;
+        if (node.left.type === 'Identifier')
+            variable = scope.get(node.left.name);
+        else if (node.left.type === 'MemberExpression') {
+            var left = node.left;
+            var object_2 = eval_1.default(left.object, scope);
+            var property_2 = left.computed
+                ? eval_1.default(left.property, scope)
+                : left.property.name;
+            variable = {
+                get: function () { return object_2[property_2]; },
+                set: function (value) {
+                    object_2[property_2] = value;
+                }
+            };
+        }
+        else
+            throw new TypeError("Can not assign to type " + node.left.type);
+        return {
+            '=': function (x) {
+                variable.set(x);
+                return x;
+            },
+            '+=': function (x) {
+                variable.set(variable.get() + x);
+                return variable.get();
+            },
+            '-=': function (x) {
+                variable.set(variable.get() - x);
+                return variable.get();
+            },
+            '*=': function (x) {
+                variable.set(variable.get() * x);
+                return variable.get();
+            },
+            '/=': function (x) {
+                variable.set(variable.get() / x);
+                return variable.get();
+            },
+            '%=': function (x) {
+                variable.set(variable.get() % x);
+                return variable.get();
+            },
+            '<<=': function (x) {
+                variable.set(variable.get() << x);
+                return variable.get();
+            },
+            '>>=': function (x) {
+                variable.set(variable.get() >> x);
+                return variable.get();
+            },
+            '>>>=': function (x) {
+                variable.set(variable.get() >>> x);
+                return variable.get();
+            },
+            '**=': function (x) {
+                variable.set(Math.pow(variable.get(), x));
+                return variable.get();
+            },
+            '|=': function (x) {
+                variable.set(variable.get() | x);
+                return variable.get();
+            },
+            '^=': function (x) {
+                variable.set(variable.get() ^ x);
+                return variable.get();
+            },
+            '&=': function (x) {
+                variable.set(variable.get() & x);
+                return variable.get();
+            }
+        }[node.operator](eval_1.default(node.right, scope));
+    },
+    LogicalExpression: function (node, scope) {
+        return ({
+            '||': function () { return eval_1.default(node.left, scope) || eval_1.default(node.right, scope); },
+            '&&': function () { return eval_1.default(node.left, scope) && eval_1.default(node.right, scope); }
+        }[node.operator]());
+    },
+    MemberExpression: function (node, scope) {
+        var object = node.object, property = node.property, computed = node.computed;
+        if (computed)
+            return eval_1.default(object, scope)[eval_1.default(property, scope)];
+        return eval_1.default(object, scope)[property.name];
+    },
+    ConditionalExpression: function (node, scope) {
+        return eval_1.default(node.test, scope)
+            ? eval_1.default(node.consequent, scope)
+            : eval_1.default(node.alternate, scope);
+    },
+    CallExpression: function (node, scope) {
+        var func = eval_1.default(node.callee, scope);
+        var args = node.arguments.map(function (arg) { return eval_1.default(arg, scope); });
+        var thisVal = scope.find('this');
+        if (node.callee.type === 'MemberExpression') {
+            var object = eval_1.default(node.callee.object, scope);
+            return func.apply(object, args);
+        }
+        return func.apply(thisVal ? thisVal.get() : null, args);
+    },
+    NewExpression: function (node, scope) {
+        var func = eval_1.default(node.callee, scope);
+        var args = node.arguments.map(function (arg) { return eval_1.default(arg, scope); });
+        return new (func.bind.apply(func, [null].concat(args)))();
+    },
+    SequenceExpression: function (node, scope) {
+        var last;
+        for (var _i = 0, _a = node.expressions; _i < _a.length; _i++) {
+            var expr = _a[_i];
+            last = eval_1.default(expr, scope);
+        }
+        return last;
+    },
+    TemplateLiteral: function (node, _scope) {
+        throw new Error(node.type + " \u672A\u5B9E\u73B0");
+    },
+    TaggedTemplateExpression: function (node, _scope) {
+        throw new Error(node.type + " \u672A\u5B9E\u73B0");
+    },
+    ClassExpression: function (_node, _scope) {
+        throw new Error('class not supported in Wechat Miniprogram');
+    },
+    MetaProperty: function (node, _scope) {
+        throw new Error(node.type + " \u672A\u5B9E\u73B0");
+    },
+    AwaitExpression: function (_node, _scope) {
+        throw new Error('await not supported in Wechat Miniprogram');
     }
 };
-exports.default = declarationHandler;
+exports.default = expressionHandler;
 
 
 /***/ }),
@@ -5697,8 +5703,8 @@ exports.default = patternHandler;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var signal_1 = __webpack_require__(2);
-var scope_1 = __webpack_require__(1);
+var common_1 = __webpack_require__(1);
+var scope_1 = __webpack_require__(2);
 var eval_1 = __webpack_require__(0);
 var statementHandler = {
     ExpressionStatement: function (node, scope) {
@@ -5709,9 +5715,7 @@ var statementHandler = {
         for (var _i = 0, _a = block.body; _i < _a.length; _i++) {
             var node = _a[_i];
             var result = eval_1.default(node, blockScope);
-            if (result === signal_1.BREAK_SINGAL ||
-                result === signal_1.CONTINUE_SINGAL ||
-                result === signal_1.RETURN_SINGAL)
+            if (result === common_1.BREAK || result === common_1.CONTINUE || result === common_1.RETURN_SINGAL)
                 return result;
         }
     },
@@ -5723,19 +5727,17 @@ var statementHandler = {
         throw new SyntaxError("'with' not supported in strict mode");
     },
     ReturnStatement: function (node, scope) {
-        signal_1.RETURN_SINGAL.result = node.argument
+        common_1.RETURN_SINGAL.result = node.argument
             ? eval_1.default(node.argument, scope)
             : undefined;
-        return signal_1.RETURN_SINGAL;
+        return common_1.RETURN_SINGAL;
     },
     LabeledStatement: function (node, _scope) {
         console.error(node.type + " \u672A\u5B9E\u73B0");
     },
-    BreakStatement: function (_node, _scope) {
-        return signal_1.BREAK_SINGAL;
-    },
+    BreakStatement: function (_node, _scope) { return common_1.BREAK; },
     ContinueStatement: function (_node, _scope) {
-        return signal_1.CONTINUE_SINGAL;
+        return common_1.CONTINUE;
     },
     IfStatement: function (node, scope) {
         if (eval_1.default(node.test, scope))
@@ -5754,9 +5756,9 @@ var statementHandler = {
                 matched = true;
             if (matched) {
                 var result = eval_1.default($case, newScope);
-                if (result === signal_1.BREAK_SINGAL)
+                if (result === common_1.BREAK)
                     break;
-                else if (result === signal_1.CONTINUE_SINGAL || result === signal_1.RETURN_SINGAL)
+                else if (result === common_1.CONTINUE || result === common_1.RETURN_SINGAL)
                     return result;
             }
         }
@@ -5786,11 +5788,11 @@ var statementHandler = {
         while (eval_1.default(node.test, scope)) {
             var newScope = new scope_1.Scope('loop', scope);
             var result = eval_1.default(node.body, newScope);
-            if (result === signal_1.BREAK_SINGAL)
+            if (result === common_1.BREAK)
                 break;
-            else if (result === signal_1.CONTINUE_SINGAL)
+            else if (result === common_1.CONTINUE)
                 continue;
-            else if (result === signal_1.RETURN_SINGAL)
+            else if (result === common_1.RETURN_SINGAL)
                 return result;
         }
     },
@@ -5798,22 +5800,22 @@ var statementHandler = {
         do {
             var newScope = new scope_1.Scope('loop', scope);
             var result = eval_1.default(node.body, newScope);
-            if (result === signal_1.BREAK_SINGAL)
+            if (result === common_1.BREAK)
                 break;
-            else if (result === signal_1.CONTINUE_SINGAL)
+            else if (result === common_1.CONTINUE)
                 continue;
-            else if (result === signal_1.RETURN_SINGAL)
+            else if (result === common_1.RETURN_SINGAL)
                 return result;
         } while (eval_1.default(node.test, scope));
     },
     ForStatement: function (node, scope) {
         for (var newScope = new scope_1.Scope('loop', scope), initVal = node.init ? eval_1.default(node.init, newScope) : null; node.test ? eval_1.default(node.test, newScope) : true; node.update ? eval_1.default(node.update, newScope) : void 0) {
             var result = eval_1.default(node.body, newScope);
-            if (result === signal_1.BREAK_SINGAL)
+            if (result === common_1.BREAK)
                 break;
-            else if (result === signal_1.CONTINUE_SINGAL)
+            else if (result === common_1.CONTINUE)
                 continue;
-            else if (result === signal_1.RETURN_SINGAL)
+            else if (result === common_1.RETURN_SINGAL)
                 return result;
         }
     },
@@ -5825,11 +5827,11 @@ var statementHandler = {
             var newScope = new scope_1.Scope('loop', scope);
             scope.declare(kind, name, value);
             var result = eval_1.default(node.body, newScope);
-            if (result === signal_1.BREAK_SINGAL)
+            if (result === common_1.BREAK)
                 break;
-            else if (result === signal_1.CONTINUE_SINGAL)
+            else if (result === common_1.CONTINUE)
                 continue;
-            else if (result === signal_1.RETURN_SINGAL)
+            else if (result === common_1.RETURN_SINGAL)
                 return result;
         }
     },

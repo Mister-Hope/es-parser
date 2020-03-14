@@ -37,6 +37,7 @@ const globalVar: { [key: string]: any } = {
   TypeError,
   URIError,
 
+  Symbol,
   Object,
   Boolean,
   Function,
