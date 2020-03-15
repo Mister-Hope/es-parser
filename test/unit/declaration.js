@@ -141,6 +141,11 @@ it("visiting undefined indetifier should throw error in 'use strict'", () => {
 });
 
 describe('function declaration', () => {
+  it('type of function should be function', () => {
+    function a() {}
+    expect(typeof a).to.be.equal('function');
+  });
+
   it('should move FunctionDeclaration to the top of the scope', () => {
     let counter = 0;
     hoisted(); // ReferenceError: hoisted is not defined
@@ -148,5 +153,52 @@ describe('function declaration', () => {
       counter += 1;
     }
     expect(counter).to.be.equal(1);
+  });
+
+  it('function can have property', () => {
+    function a() {
+      return 0;
+    }
+    expect(typeof a).to.be.equal('function');
+    expect(a()).to.be.equal(0);
+    expect(a.a).to.be.equal(undefined);
+  });
+
+  it('function can add property', () => {
+    a.a = 1;
+    function a() {
+      return 0;
+    }
+    expect(typeof a).to.be.equal('function');
+    expect(a()).to.be.equal(0);
+    expect(a.a).to.be.equal(1);
+  });
+
+  it('function can change property', () => {
+    a.a = 1;
+    function a() {
+      return 0;
+    }
+    expect(typeof a).to.be.equal('function');
+    expect(a()).to.be.equal(0);
+    expect(a.a).to.be.equal(1);
+    a.a = 2;
+    expect(typeof a).to.be.equal('function');
+    expect(a()).to.be.equal(0);
+    expect(a.a).to.be.equal(2);
+  });
+
+  it('function can delete property', () => {
+    a.a = 1;
+    function a() {
+      return 0;
+    }
+    expect(typeof a).to.be.equal('function');
+    expect(a()).to.be.equal(0);
+    expect(a.a).to.be.equal(1);
+    delete a.a;
+    expect(typeof a).to.be.equal('function');
+    expect(a()).to.be.equal(0);
+    expect(a.a).to.be.equal(undefined);
   });
 });

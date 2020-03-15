@@ -145,13 +145,77 @@ describe('declaration test', () => {
   });
 
   describe('function declaration', () => {
+    it('type of function should be function', () => {
+      function a() {}
+      expect(typeof a).to.be.equal('function');
+    });
+
     it('should move FunctionDeclaration to the top of the scope', () => {
       let counter = 0;
-      hoisted(); // ReferenceError: hoisted is not defined
+      hoisted();
       function hoisted() {
         counter += 1;
       }
+
       expect(counter).to.be.equal(1);
+    });
+
+    it('function can refer undeclared variable', () => {
+      function hoisted() {
+        counter += 1;
+      }
+      let counter = 0;
+      hoisted();
+
+      expect(counter).to.be.equal(1);
+    });
+
+    it('function can have property', () => {
+      function a() {
+        return 0;
+      }
+
+      expect(typeof a).to.be.equal('function');
+      expect(a()).to.be.equal(0);
+      expect(a.a).to.be.equal(undefined);
+    });
+
+    it('function can add property', () => {
+      a.a = 1;
+      function a() {
+        return 0;
+      }
+      expect(typeof a).to.be.equal('function');
+      expect(a()).to.be.equal(0);
+      expect(a.a).to.be.equal(1);
+    });
+
+    it('function can change property', () => {
+      a.a = 1;
+      function a() {
+        return 0;
+      }
+      expect(typeof a).to.be.equal('function');
+      expect(a()).to.be.equal(0);
+      expect(a.a).to.be.equal(1);
+      a.a = 2;
+      expect(typeof a).to.be.equal('function');
+      expect(a()).to.be.equal(0);
+      expect(a.a).to.be.equal(2);
+    });
+
+    it('function can delete property', () => {
+      a.a = 1;
+      function a() {
+        return 0;
+      }
+      expect(typeof a).to.be.equal('function');
+      expect(a()).to.be.equal(0);
+      expect(a.a).to.be.equal(1);
+      delete a.a;
+      expect(typeof a).to.be.equal('function');
+      expect(a()).to.be.equal(0);
+      expect(a.a).to.be.equal(undefined);
     });
   });
 });
@@ -367,7 +431,6 @@ describe('identifier test', () => {
 });
 
 describe('switch test', () => {
-  // @ts-nocheck
   const testSwitch = function(value) {
     let temp = 0;
     switch (value) {
@@ -414,5 +477,45 @@ describe('switch test', () => {
 
   it('should handle return', () => {
     expect(testSwitch(2)).to.be.equal(4);
+  });
+});
+
+describe('UnaryExpression', () => {
+  describe('typeof', () => {
+    it('typeof null is object', () => {
+      expect(typeof null).to.be.equal('object');
+    });
+
+    it('undeclared variable is undefined', () => {
+      expect(typeof a).to.be.equal('undefined');
+    });
+
+    it('undefined is undefined', () => {
+      expect(typeof undefined).to.be.equal('undefined');
+    });
+
+    it('number', () => {
+      expect(typeof 1).to.be.equal('number');
+      expect(typeof 5e12).to.be.equal('number');
+      expect(typeof 0b0110).to.be.equal('number');
+      expect(typeof 0o122).to.be.equal('number');
+      expect(typeof Number.NaN).to.be.equal('number');
+      expect(typeof Infinity).to.be.equal('number');
+      expect(typeof 1.123).to.be.equal('number');
+      expect(typeof Number('1e asd')).to.be.equal('number');
+    });
+
+    it('boolean', () => {
+      expect(typeof true).to.be.equal('boolean');
+      expect(typeof false).to.be.equal('boolean');
+      expect(typeof Boolean('1e asd')).to.be.equal('boolean');
+    });
+
+    it('function', () => {
+      function a() {}
+      const b = () => '';
+      expect(typeof a).to.be.equal('function');
+      expect(typeof b).to.be.equal('function');
+    });
   });
 });

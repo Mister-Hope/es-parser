@@ -48,7 +48,8 @@ const globalVar: { [key: string]: any } = {
   RegExp,
   Array,
   JSON,
-  Promise
+  Promise,
+  Infinity
 };
 
 /** 解析代码 */
@@ -79,7 +80,7 @@ export const run = (
   evaluate((parse(code) as unknown) as ESTree.Node, scope);
 
   // exports
-  return scope.find('module')?.value.exports || null;
+  return scope.getValue('module').exports;
 };
 
 export default {

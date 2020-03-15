@@ -40,12 +40,15 @@ class FunctionVariable implements Variable {
   /** 函数体 */
   private _value: any;
 
+  /** 函数属性 */
+  public _properties: Record<any, any> = {};
+
   constructor(value: any) {
     this._value = value;
   }
 
   public get value() {
-    return this._value();
+    return Object.assign(this._value(), { __props__: this._properties });
   }
 
   public set value(value: any) {
@@ -74,17 +77,7 @@ export class Scope {
     this.variables = {};
   }
 
-  /** 尝试获取变量值 */
-  public find(varName: string): Variable | undefined {
-    const name = `@${varName}`;
-    // eslint-disable-next-line no-prototype-builtins
-    if (this.variables.hasOwnProperty(name)) return this.variables[name];
-    else if (this.parent) return this.parent.find(varName);
-
-    return undefined;
-  }
-
-  /** 得到变量值 */
+  /** 得到变量对象 */
   public get(varName: string): Variable {
     const name = `@${varName}`;
     // eslint-disable-next-line no-prototype-builtins
@@ -92,6 +85,11 @@ export class Scope {
     else if (this.parent) return this.parent.get(varName);
 
     throw new ReferenceError(`${varName} is not defined`);
+  }
+
+  /** 得到变量值 */
+  public getValue(varName: string): any {
+    return this.get(varName).value;
   }
 
   /**

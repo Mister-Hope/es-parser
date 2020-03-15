@@ -1,5 +1,6 @@
+/* eslint-disable no-underscore-dangle */
 import * as ESTree from 'estree';
-import { Scope } from './scope';
+import { Scope, Variable } from './scope';
 import evaluate from './eval';
 
 /** Break 标志 */
@@ -71,4 +72,44 @@ export const handleDeclaration = (
   // 再执行函数声明
   for (const node of nodes)
     if (node.type === 'FunctionDeclaration') evaluate(node, scope);
+};
+
+/** 返回正确的成员 */
+export const getMember = (node: ESTree.MemberExpression, scope: Scope) => {
+  /** 解析得到的所在对象 */
+  const object = evaluate(node.object, scope);
+  /** 对应的属性名称 */
+  const property =
+    // 是否需要计算
+    node.computed
+      ? evaluate(node.property, scope)
+      : (node.property as ESTree.Identifier).name;
+
+  /** 真正的对象 */
+  const realObject =
+    typeof object === 'function' &&
+    object.__props__ &&
+    object[property] === undefined
+      ? object.__props__
+      : object;
+
+  return [realObject, property];
+};
+
+/** 返回正确的成员值 */
+export const getMemberVariable = (
+  node: ESTree.MemberExpression,
+  scope: Scope
+) => {
+  const [realObject, property] = getMember(node, scope);
+
+  // 生成变量对象
+  return {
+    get value() {
+      return realObject[property];
+    },
+    set value(value: any) {
+      realObject[property] = value;
+    }
+  };
 };

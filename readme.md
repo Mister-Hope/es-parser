@@ -3,7 +3,9 @@
 [![Author: Mr.Hope](https://img.shields.io/badge/作者-Mr.Hope-blue.svg?style=for-the-badge)](https://mrhope.site)
 <!-- [![License](https://img.shields.io/npm/l/es-parser.svg?style=for-the-badge)](https://github.com/Mister-Hope/es-parser/blob/master/LICENSE) -->
 
-一个 100KB 大小的 JS 解释器
+一个 110KB 大小的 JS 解释器/运行器
+
+A 110KB size JS parser and runner.
 
 ## Import
 
@@ -60,25 +62,7 @@ progress.onProgressUpdate(res => {
 
 ## Known Bugs
 
-- `function` declaration can not rise to the top of the scope.
-
-    So code like below will throw an error:
-
-    ```js
-    hoisted(); // ReferenceError: hoisted is not defined
-
-    function hoisted() {
-      console.log('foo');
-    }
-    ```
-
-    In order to avoid this issue, please consider using `function expression` always:
-
-    ```js
-    const hoisted = () => {
-      console.log('foo');
-    };
-    ```
+None, but package is still in test.
 
 ## Notes
 

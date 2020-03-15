@@ -27,6 +27,14 @@ describe('declaration test', () => {
   });
 });
 
+describe('expression test', () => {
+  compiledParser.run(fs.readFileSync(`${base}/expression.js`, 'utf-8'), {
+    describe,
+    expect,
+    it
+  });
+});
+
 describe('switch test', () => {
   compiledParser.run(fs.readFileSync(`${base}/switch.js`, 'utf-8'), {
     expect,

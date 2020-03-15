@@ -15,12 +15,12 @@ describe('Number Test', () => {
     expect(c).to.be.equal(130000);
   });
 
-  it('oct', () => {
+  it('bin', () => {
     const d = 0b111110111;
     expect(d).to.be.equal(503);
   });
 
-  it('hex', () => {
+  it('oct', () => {
     const e = 0o767;
     expect(e).to.be.equal(503);
   });
@@ -203,6 +203,4 @@ describe('Boolean test', () => {
 
 it('undefined and null test', () => {
   expect(undefined).not.to.be.equal(null);
-  expect(typeof undefined).to.be.equal('undefined');
-  expect(typeof null).to.be.equal('object');
 });

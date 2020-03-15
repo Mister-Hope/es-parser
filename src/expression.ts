@@ -1,8 +1,9 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-bitwise */
 import * as ESTree from 'estree';
 import { Scope, Variable } from './scope';
-import { getFunction, getThis } from './common';
+import { getFunction, getMember, getMemberVariable, getThis } from './common';
 import evaluate from './eval';
 
 const expressionHandler = {
@@ -89,31 +90,32 @@ const expressionHandler = {
       // eslint-disable-next-line no-void
       void: () => void evaluate(node.argument, scope),
       typeof: () => {
-        if (node.argument.type === 'Identifier') {
-          const variable = scope.find(node.argument.name);
-
-          return variable === undefined ? 'undefined' : typeof variable.value;
-        }
+        if (node.argument.type === 'Identifier')
+          try {
+            return typeof scope.getValue(node.argument.name);
+          } catch (err) {
+            return 'undefined';
+          }
 
         return typeof evaluate(node.argument, scope);
       },
       delete: () => {
-        if (node.argument.type === 'MemberExpression') {
-          const { object, property, computed } = node.argument;
+        switch (node.argument.type) {
+          case 'MemberExpression': {
+            const [realObject, property] = getMember(node.argument, scope);
 
-          if (computed)
-            return delete evaluate(object, scope)[evaluate(property, scope)];
+            return delete realObject[property];
+          }
 
-          return delete evaluate(object, scope)[
-            (property as ESTree.Identifier).name
-          ];
-        } else if (node.argument.type === 'Identifier') {
-          const ctx = getThis(scope);
+          case 'Identifier': {
+            const ctx = getThis(scope);
 
-          return ctx ? ctx.value[node.argument.name] : false;
+            return ctx ? ctx.value[node.argument.name] : false;
+          }
+
+          default:
+            return false;
         }
-
-        return false;
       }
     }[node.operator]()),
 
@@ -124,22 +126,8 @@ const expressionHandler = {
 
     if (node.argument.type === 'Identifier')
       variable = scope.get(node.argument.name);
-    else if (node.argument.type === 'MemberExpression') {
-      const { argument } = node;
-      const object = evaluate(argument.object, scope);
-      const property = argument.computed
-        ? evaluate(argument.property, scope)
-        : (argument.property as ESTree.Identifier).name;
-
-      variable = {
-        get value() {
-          return object[property];
-        },
-        set value(value: any) {
-          object[property] = value;
-        }
-      };
-    }
+    else if (node.argument.type === 'MemberExpression')
+      variable = getMemberVariable(node.argument, scope);
 
     return {
       '--': (x: number) => {
@@ -191,25 +179,9 @@ const expressionHandler = {
     // 普通标识符
     if (node.left.type === 'Identifier') variable = scope.get(node.left.name);
     // 成员表达式
-    else if (node.left.type === 'MemberExpression') {
-      const { left } = node;
-      // 获取到所在对象
-      const object = evaluate(left.object, scope);
-      // 获取对应的属性名称
-      const property = left.computed
-        ? evaluate(left.property, scope)
-        : (left.property as ESTree.Identifier).name;
-
-      // 生成变量对象
-      variable = {
-        get value() {
-          return object[property];
-        },
-        set value(value: any) {
-          object[property] = value;
-        }
-      };
-    } else throw new TypeError(`Can not assign to type ${node.left.type}`);
+    else if (node.left.type === 'MemberExpression')
+      variable = getMemberVariable(node.left, scope);
+    else throw new TypeError(`Can not assign to type ${node.left.type}`);
 
     return {
       '=': (x: any) => (variable.value = x),
@@ -235,12 +207,11 @@ const expressionHandler = {
       '&&': () => evaluate(node.left, scope) && evaluate(node.right, scope)
     }[node.operator]()),
 
+  /** 成员表达式 */
   MemberExpression: (node: ESTree.MemberExpression, scope: Scope) => {
-    const { object, property, computed } = node;
+    const [realObject, property] = getMember(node, scope);
 
-    if (computed) return evaluate(object, scope)[evaluate(property, scope)];
-
-    return evaluate(object, scope)[(property as ESTree.Identifier).name];
+    return realObject[property];
   },
 
   /** 三元表达式 */

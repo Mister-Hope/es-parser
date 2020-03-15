@@ -25,7 +25,7 @@ evaluateMap = Object.assign(
     /** 标识符 */
     Identifier: (node: ESTree.Identifier, scope: Scope) =>
       // 处理 undefined
-      node.name === 'undefined' ? undefined : scope.get(node.name).value,
+      node.name === 'undefined' ? undefined : scope.getValue(node.name),
 
     /** 文字表达式 */
     Literal: (node: ESTree.Literal, _scope: Scope) => node.value,
