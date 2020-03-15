@@ -39,6 +39,7 @@ const statementHandler = {
      *   }
      */
 
+    // 先将 var 变量声明为 undefined
     for (const node of block.body)
       if (node.type === 'VariableDeclaration' && node.kind === 'var')
         // 依次声明变量

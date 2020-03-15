@@ -3,3 +3,10 @@ test/
 .eslintignore
 .eslintrc.yml
 .prettierrc.yml
+.huskyrc.json
+.lintstagedrc.js
+.prettierrc.yml
+.renovaterc.json
+.travis.yml
+tsconfig.json
+webpack.config.js

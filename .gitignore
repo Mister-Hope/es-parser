@@ -1,3 +1,4 @@
 node_modules/
 test/code.js
+test/debug.js
 test/estree.json

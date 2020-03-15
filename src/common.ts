@@ -44,9 +44,9 @@ export const getFunction = (
     // 声明 arguments
     functionScope.const('arguments', args);
 
-    // 执行函数
+    // 解析函数体
     const result = evaluate(node.body, functionScope);
 
-    // 如果存在返回值，则返回
+    // 如果函数体存在返回值，则返回
     if (result === RETURN_SINGAL) return result.result;
   };

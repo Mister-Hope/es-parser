@@ -12,6 +12,7 @@
     "test:dev": "mocha -r ts-node/register  --watch test/unit/**/*.ts",
     "test:js": "mocha ./test/unit/index.js",
     "parse": "node ./test/parse.js",
+    "debug": "mocha -r ts-node/register  --watch test/debug.ts",
     "lint": "eslint . --fix",
     "lint:check": "eslint .",
     "commit": "npx git-cz"
