@@ -3,30 +3,22 @@ os: linux
 dist: bionic
 node_js:
   - lts/*
+before_script:
+  - yarn run build
 jobs:
   include:
-    - stage: build
-      name: build es-parser
-      script:
-        - yarn run build
-
-    - stage: ts-test
+    - stage: test
       name: "Test in TypeScript"
       script:
         - yarn run test
 
-    - stage: js-test
-      name: "Test in JavaScript"
+    - name: "Test in JavaScript"
       script:
         - yarn run test:js
 
-    - stage: self-parse-test
-      name: "Parser self parse test"
+    - name: "Parser self parse test"
       script:
         - yarn run test:parser
 
 stages:
-  - name: build
-  - name: ts-test
-  - name: js-test
-  - name: self-parse-test
+  - name: test
