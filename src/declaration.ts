@@ -24,7 +24,8 @@ const declarationHandler = {
   /** 函数声明 */
   FunctionDeclaration: (node: ESTree.FunctionDeclaration, scope: Scope) => {
     // `export default function` 时为 `null`
-    if (node.id) scope.const(node.id.name, getFunction(node, scope));
+    if (node.id)
+      scope.declare('function', node.id.name, () => getFunction(node, scope));
   },
 
   /** 类声明 */

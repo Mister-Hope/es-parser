@@ -2,7 +2,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable consistent-return */
 import * as ESTree from 'estree';
-import { BREAK, CONTINUE, RETURN_SINGAL } from './common';
+import { BREAK, CONTINUE, RETURN_SINGAL, handleDeclaration } from './common';
 import { Scope } from './scope';
 import evaluate from './eval';
 
@@ -18,45 +18,16 @@ const statementHandler = {
     // 需要生成新的块作用域
     const blockScope = new Scope('block', scope);
 
-    // 先执行函数声明
-    /*
-     * for (const node of block.body)
-     *   if (node.type === 'FunctionDeclaration') evaluate(node, scope);
-     */
+    handleDeclaration(block.body, blockScope);
 
     // 执行块的主体，并做相应返回
-    /*
-     * for (const node of block.body)
-     *   if (node.type !== 'FunctionDeclaration') {
-     *     const result = evaluate(node, blockScope);
-     *
-     *     if (
-     *       result === BREAK_SINGAL ||
-     *       result === CONTINUE_SINGAL ||
-     *       result === RETURN_SINGAL
-     *     )
-     *       return result;
-     *   }
-     */
-
-    // 先将 var 变量声明为 undefined
     for (const node of block.body)
-      if (node.type === 'VariableDeclaration' && node.kind === 'var')
-        // 依次声明变量
-        node.declarations.forEach(declarator => {
-          /** 变量名称 */
-          const varName = (declarator.id as ESTree.Identifier).name;
+      if (node.type !== 'FunctionDeclaration') {
+        const result = evaluate(node, blockScope);
 
-          scope.declare('var', varName, undefined);
-        });
-
-    // 执行块的主体，并做相应返回
-    for (const node of block.body) {
-      const result = evaluate(node, blockScope);
-
-      if (result === BREAK || result === CONTINUE || result === RETURN_SINGAL)
-        return result;
-    }
+        if (result === BREAK || result === CONTINUE || result === RETURN_SINGAL)
+          return result;
+      }
   },
 
   /** 空表达式 */
@@ -77,6 +48,7 @@ const statementHandler = {
     RETURN_SINGAL.result = node.argument
       ? evaluate(node.argument, scope)
       : undefined;
+
     return RETURN_SINGAL;
   },
 

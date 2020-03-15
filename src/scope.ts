@@ -3,7 +3,7 @@
 export type ScopeType = 'function' | 'loop' | 'switch' | 'block';
 
 /** 声明类型 */
-export type DeclarationType = 'const' | 'let' | 'var';
+export type DeclarationType = 'const' | 'let' | 'var' | 'function';
 
 export interface Variable {
   // 变量的值
@@ -23,22 +23,32 @@ class ScopeVariable implements Variable {
     this._value = value;
   }
 
-  /** 获取作用域变量值 */
   public get value() {
     return this._value;
   }
 
-  /**
-   * 设置作用域变量值
-   *
-   * @param value
-   * @returns 是否设置成功
-   */
   public set value(value: any) {
     // const 不能二次赋值
     if (this.declarationType === 'const')
       throw new TypeError('Assignment to constant variable.');
 
+    this._value = value;
+  }
+}
+
+class FunctionVariable implements Variable {
+  /** 函数体 */
+  private _value: any;
+
+  constructor(value: any) {
+    this._value = value;
+  }
+
+  public get value() {
+    return this._value();
+  }
+
+  public set value(value: any) {
     this._value = value;
   }
 }
@@ -148,6 +158,13 @@ export class Scope {
       );
 
     this.variables[name] = new ScopeVariable('var', value);
+  }
+
+  /** 声明函数 */
+  public function(functionName: string, value: any) {
+    const name = `@${functionName}`;
+
+    this.variables[name] = new FunctionVariable(value);
   }
 
   /**

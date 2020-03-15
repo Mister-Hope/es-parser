@@ -2,7 +2,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable consistent-return */
 import * as ESTree from 'estree';
-import { BREAK, CONTINUE, RETURN_SINGAL } from './common';
+import { BREAK, CONTINUE, RETURN_SINGAL, handleDeclaration } from './common';
 import { EvaluateFunc, EvaluateMap } from './type';
 import { Scope } from './scope';
 import declarationHandler from './declaration';
@@ -15,19 +15,6 @@ import statementHandler from './statement';
 // eslint-disable-next-line prefer-const
 let evaluateMap: EvaluateMap;
 
-/*
- * const checkNodeType = (type: string) => {
- *   if (!Object.keys(evaluateMap).includes(type)) console.log(type);
- * };
- */
-
-/*
- * const evaluate = (node: ESTree.Node, scope: Scope, arg?: any) => {
- *   checkNodeType(node.type);
- *   return (evaluateMap[node.type] as EvaluateFunc)(node, scope, arg);
- * };
- */
-
 /** 执行操作 */
 const evaluate = (node: ESTree.Node, scope: Scope, arg?: any) =>
   (evaluateMap[node.type] as EvaluateFunc)(node, scope, arg);
@@ -36,42 +23,20 @@ const evaluate = (node: ESTree.Node, scope: Scope, arg?: any) =>
 evaluateMap = Object.assign(
   {
     /** 标识符 */
-    Identifier: (node: ESTree.Identifier, scope: Scope) => {
+    Identifier: (node: ESTree.Identifier, scope: Scope) =>
       // 处理 undefined
-      if (node.name === 'undefined') return undefined;
-
-      // 获取变量并返回其值
-      return scope.get(node.name).value;
-    },
+      node.name === 'undefined' ? undefined : scope.get(node.name).value,
 
     /** 文字表达式 */
     Literal: (node: ESTree.Literal, _scope: Scope) => node.value,
 
     /** 程序表达式 */
     Program: (program: ESTree.Program, scope: Scope) => {
-      for (const node of program.body)
-        if (node.type === 'VariableDeclaration' && node.kind === 'var')
-          // 依次声明变量
-          node.declarations.forEach(declarator => {
-            /** 变量名称 */
-            const varName = (declarator.id as ESTree.Identifier).name;
-
-            scope.declare('var', varName, undefined);
-          });
-
-      // 依次执行每一行，直到有返回值时返回，并停止执行
-      for (const node of program.body) evaluate(node, scope);
-      // 先执行函数声明
-      /*
-       * for (const node of program.body)
-       *   if (node.type === 'FunctionDeclaration') evaluate(node, scope);
-       */
+      handleDeclaration(program.body, scope);
 
       // 依次执行每一行
-      /*
-       * for (const node of program.body)
-       *   if (node.type !== 'FunctionDeclaration') evaluate(node, scope);
-       */
+      for (const node of program.body)
+        if (node.type !== 'FunctionDeclaration') evaluate(node, scope);
     },
 
     /** switch 中的 case 表达式 */

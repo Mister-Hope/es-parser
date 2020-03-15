@@ -50,3 +50,26 @@ export const getFunction = (
     // 如果函数体存在返回值，则返回
     if (result === RETURN_SINGAL) return result.result;
   };
+
+/** 额外处理声明 */
+export const handleDeclaration = (
+  nodes: (ESTree.Directive | ESTree.Statement | ESTree.ModuleDeclaration)[],
+  scope: Scope
+) => {
+  // 先将 var 变量声明为 undefined
+  for (const node of nodes)
+    if (node.type === 'VariableDeclaration' && node.kind === 'var')
+      // 依次声明变量
+      node.declarations.forEach(declarator =>
+        scope.declare(
+          'var',
+          /** 变量名称 */
+          (declarator.id as ESTree.Identifier).name,
+          undefined
+        )
+      );
+
+  // 再执行函数声明
+  for (const node of nodes)
+    if (node.type === 'FunctionDeclaration') evaluate(node, scope);
+};
