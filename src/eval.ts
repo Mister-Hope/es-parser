@@ -50,9 +50,8 @@ evaluateMap = Object.assign(
       }
     },
 
-    CatchClause: (node: ESTree.CatchClause, scope: Scope) => {
-      return evaluate(node.body, scope);
-    },
+    CatchClause: (node: ESTree.CatchClause, scope: Scope) =>
+      evaluate(node.body, scope),
 
     VariableDeclarator: (_node: ESTree.VariableDeclarator, _scope: Scope) => {
       throw new Error('不应出现');

@@ -51,6 +51,10 @@ const globalVar: { [key: string]: any } = {
   Promise
 };
 
+/** 解析代码 */
+export const parse = (code: string) => acorn.parse(code, options);
+
+/** 运行代码 */
 export const run = (
   code: string,
   addtionalGlobalVar: Record<string, any> = {}
@@ -72,12 +76,13 @@ export const run = (
   scope.const('module', $module);
   scope.const('exports', $exports);
 
-  evaluate((acorn.parse(code, options) as unknown) as ESTree.Node, scope);
+  evaluate((parse(code) as unknown) as ESTree.Node, scope);
 
   // exports
   return scope.find('module')?.value.exports || null;
 };
 
 export default {
+  parse,
   run
 };

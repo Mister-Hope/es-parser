@@ -60,14 +60,13 @@ export const handleDeclaration = (
   for (const node of nodes)
     if (node.type === 'VariableDeclaration' && node.kind === 'var')
       // 依次声明变量
-      node.declarations.forEach(declarator =>
+      for (const declarator of node.declarations)
         scope.declare(
           'var',
           /** 变量名称 */
           (declarator.id as ESTree.Identifier).name,
           undefined
-        )
-      );
+        );
 
   // 再执行函数声明
   for (const node of nodes)

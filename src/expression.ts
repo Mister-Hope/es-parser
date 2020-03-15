@@ -252,24 +252,25 @@ const expressionHandler = {
   /** call 表达式 */
   CallExpression: (node: ESTree.CallExpression, scope: Scope) => {
     const func = evaluate(node.callee, scope);
-    const args = node.arguments.map(arg => evaluate(arg, scope));
-    const thisVal = getThis(scope);
+    const args = node.arguments.map(argument => evaluate(argument, scope));
 
-    if (node.callee.type === 'MemberExpression') {
-      const object = evaluate(node.callee.object, scope);
-      return func.apply(object, args);
-    }
-
-    return func.apply(thisVal?.value || null, args);
+    return node.callee.type === 'MemberExpression'
+      ? // 成员表达式，this 为调用它的对象
+        func.apply(evaluate(node.callee.object, scope), args)
+      : // 获取函数运行环境的 this
+        func.apply(getThis(scope)?.value || null, args);
   },
 
   /** new 表达式 */
   NewExpression: (node: ESTree.NewExpression, scope: Scope) => {
     const func = evaluate(node.callee, scope);
-    const args = node.arguments.map(arg => evaluate(arg, scope));
 
     // eslint-disable-next-line prefer-spread
-    return new (func.bind.apply(func, [null].concat(args)))();
+    return new (func.bind.apply(
+      func,
+      // 生成 arguments 数组
+      [null].concat(node.arguments.map(argument => evaluate(argument, scope)))
+    ))();
   },
 
   SequenceExpression: (node: ESTree.SequenceExpression, scope: Scope) => {
