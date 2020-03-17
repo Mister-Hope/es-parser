@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import * as ESTree from 'estree';
-import { Scope, Variable } from './scope';
+import { Scope } from './scope';
 import evaluate from './eval';
 
 /** Break 标志 */

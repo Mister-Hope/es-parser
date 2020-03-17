@@ -184,10 +184,6 @@ overrides:
 
     rules:
       "@typescript-eslint/explicit-function-return-type": off
-      # "@typescript-eslint/explicit-function-return-type":
-      #   - warn
-      #   - allowTypedFunctionExpressions: true
-
       "@typescript-eslint/no-explicit-any": off
 
   - files:

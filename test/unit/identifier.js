@@ -1,13 +1,13 @@
 // @ts-nocheck
-describe('Number Test', () => {
+describe('Number', () => {
   it('int', () => {
     const a = 0;
-    expect(a).to.be.equal(0);
+    expect(a).to.be.equal(Number(''));
   });
 
   it('decimal', () => {
     const b = 0.123;
-    expect(b).to.be.equal(0.123);
+    expect(b).to.be.equal(123 / 1000);
   });
 
   it('science', () => {
@@ -18,6 +18,18 @@ describe('Number Test', () => {
   it('bin', () => {
     const d = 0b111110111;
     expect(d).to.be.equal(503);
+  });
+
+  it('infinity', () => {
+    const h = 1 / 0;
+    expect(Number.isFinite(h)).to.be.equal(false);
+    expect(h).to.be.equal(Infinity);
+  });
+
+  it('NaN', () => {
+    const k = '张' * 2;
+    expect(Number.isNaN(k)).to.be.equal(true);
+    expect(k).to.be.not.equal(Number.NaN);
   });
 
   it('oct', () => {
@@ -39,16 +51,6 @@ describe('Number Test', () => {
   it('transfrom', () => {
     const g = '1' * '2';
     expect(g).to.be.equal(2);
-  });
-
-  it('infinity', () => {
-    const h = 1 / 0;
-    expect(Number.isFinite(h)).to.be.equal(false);
-  });
-
-  it('NaN', () => {
-    const k = '张' * 2;
-    expect(Number.isNaN(k)).to.be.equal(true);
   });
 });
 
@@ -98,8 +100,8 @@ describe('Array test', () => {
   });
 });
 
-describe('Object test', () => {
-  it('Object declare', () => {
+describe('Object', () => {
+  it('can be declared', () => {
     const a = { a: 1, b: 2 };
     expect(a).to.be.deep.equal({ a: 1, b: 2 });
     expect(a.a).to.be.equal(1);
@@ -111,20 +113,29 @@ describe('Object test', () => {
     expect(b.c).to.be.equal(undefined);
   });
 
-  describe('property', () => {
+  it('should allow duplicate object key', () => {
+    const obj = {
+      a: 1,
+      a: 2
+    };
+    expect(obj).to.be.deep.equal({ a: 2 });
+    expect(Object.keys(obj).length).to.be.equal(1);
+  });
+
+  describe("'s property", () => {
     const a = { a: 1, b: 2 };
 
-    it('change', () => {
+    it('can be changed', () => {
       a.a = 2;
       expect(a.a).to.be.equal(2);
     });
 
-    it('add', () => {
+    it('can be added', () => {
       a.c = 3;
       expect(a.c).to.be.equal(3);
     });
 
-    it('delete', () => {
+    it('can be deleted', () => {
       delete a.b;
       expect(a.b).to.be.equal(undefined);
       expect(Object.keys(a).indexOf('b')).to.be.equal(-1);
@@ -203,4 +214,29 @@ describe('Boolean test', () => {
 
 it('undefined and null test', () => {
   expect(undefined).not.to.be.equal(null);
+});
+
+describe('function', () => {
+  it("'s proto can be override", () => {
+    const a = function(text) {};
+
+    a.prototype = {
+      toString() {
+        return JSON.stringify(this);
+      },
+      valueOf() {
+        return 1;
+      }
+    };
+
+    const b = new a();
+
+    expect(typeof a).to.be.equal('function');
+    expect(b.__proto__).to.be.equal(a.prototype);
+    expect(typeof b.toString).to.be.equal('function');
+    expect(typeof b.valueOf).to.be.equal('function');
+    expect(b.toString).to.be.equal(a.prototype.toString);
+    expect(b.valueOf).to.be.equal(a.prototype.valueOf);
+    expect(b + 1).to.be.equal(2);
+  });
 });

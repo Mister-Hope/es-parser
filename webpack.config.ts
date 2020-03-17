@@ -1,3 +1,5 @@
+import * as webpack from 'webpack';
+
 module.exports = {
   target: 'node',
   mode: 'production',
@@ -13,4 +15,4 @@ module.exports = {
   module: {
     rules: [{ test: /\.ts$/u, loader: 'ts-loader' }]
   }
-};
+} as webpack.Configuration;

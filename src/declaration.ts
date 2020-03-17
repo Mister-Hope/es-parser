@@ -9,16 +9,15 @@ const declarationHandler = {
   /** 变量声明 */
   VariableDeclaration: (node: ESTree.VariableDeclaration, scope: Scope) => {
     // 依次声明变量
-    for (const declarator of node.declarations) {
-      /** 变量名称 */
-      const varName = (declarator.id as ESTree.Identifier).name;
-      /** 变量值 */
-      const value = declarator.init
-        ? evaluate(declarator.init, scope)
-        : undefined;
-
-      scope.declare(node.kind, varName, value);
-    }
+    for (const declarator of node.declarations)
+      scope.declare(
+        /** 声明类型 */
+        node.kind,
+        /** 变量名称 */
+        (declarator.id as ESTree.Identifier).name,
+        /** 变量值 */
+        declarator.init ? evaluate(declarator.init, scope) : undefined
+      );
   },
 
   /** 函数声明 */

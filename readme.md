@@ -67,3 +67,7 @@ None, but package is still in test.
 ## Notes
 
 - You should always access `isFinite`, `isNaN` through `Number`.
+
+## TODO
+
+- add Stack Track
