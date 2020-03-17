@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import * as ESTree from 'estree';
+import { getFunction, getStack } from './common';
 import { Scope } from './scope';
 import evaluate from './eval';
-import { getFunction } from './common';
 
 /** 声明处理 */
 const declarationHandler = {
@@ -28,9 +28,11 @@ const declarationHandler = {
   },
 
   /** 类声明 */
-  ClassDeclaration: (_node: ESTree.ClassDeclaration, _scope: Scope) => {
+  ClassDeclaration: (node: ESTree.ClassDeclaration, _scope: Scope) => {
     // 小程序环境不支持
-    throw new Error('Class not supported in Wechat Miniprogram');
+    throw new Error(
+      `Class not supported in Wechat Miniprogram${getStack(node)}`
+    );
   }
 };
 

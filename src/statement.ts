@@ -2,7 +2,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable consistent-return */
 import * as ESTree from 'estree';
-import { BREAK, CONTINUE, RETURN_SINGAL, handleDeclaration } from './common';
+import { Break, Continue, Return, handleDeclaration } from './common';
 import { Scope } from './scope';
 import evaluate from './eval';
 
@@ -25,9 +25,15 @@ const statementHandler = {
       if (node.type !== 'FunctionDeclaration') {
         const result = evaluate(node, blockScope);
 
-        if (result === BREAK || result === CONTINUE || result === RETURN_SINGAL)
+        if (
+          result instanceof Break ||
+          result instanceof Continue ||
+          result instanceof Return
+        )
           return result;
       }
+
+    return undefined;
   },
 
   /** 空表达式 */
@@ -44,23 +50,29 @@ const statementHandler = {
     throw new SyntaxError("'with' not supported in strict mode");
   },
 
+  /** 返回表达式 */
   ReturnStatement: (node: ESTree.ReturnStatement, scope: Scope) => {
-    RETURN_SINGAL.result = node.argument
-      ? evaluate(node.argument, scope)
-      : undefined;
-
-    return RETURN_SINGAL;
+    return new Return(
+      node.argument ? evaluate(node.argument, scope) : undefined
+    );
   },
 
-  LabeledStatement: (node: ESTree.LabeledStatement, _scope: Scope) => {
-    console.error(`${node.type} 未实现`);
-    // throw new Error(`${node.type} 未实现`);
-  },
+  /** 标签表达式 */
+  LabeledStatement: (node: ESTree.LabeledStatement, scope: Scope) =>
+    evaluate(
+      node.body,
+      new Scope('block', scope, {
+        __label__: node.label.name
+      })
+    ),
 
-  BreakStatement: (_node: ESTree.BreakStatement, _scope: Scope) => BREAK,
+  /** break 语句 */
+  BreakStatement: (node: ESTree.BreakStatement, _scope: Scope) =>
+    new Break(node.label?.name || undefined),
 
-  ContinueStatement: (_node: ESTree.ContinueStatement, _scope: Scope) =>
-    CONTINUE,
+  /** continue 语句 */
+  ContinueStatement: (node: ESTree.ContinueStatement, _scope: Scope) =>
+    new Continue(node.label?.name || undefined),
 
   IfStatement: (node: ESTree.IfStatement, scope: Scope) => {
     if (evaluate(node.test, scope)) return evaluate(node.consequent, scope);
@@ -83,10 +95,13 @@ const statementHandler = {
       if (matched) {
         const result = evaluate($case, newScope);
 
-        if (result === BREAK) break;
-        else if (result === CONTINUE || result === RETURN_SINGAL) return result;
+        if (result instanceof Break) break;
+        else if (result instanceof Continue || result instanceof Return)
+          return result;
       }
     }
+
+    return undefined;
   },
 
   ThrowStatement: (node: ESTree.ThrowStatement, scope: Scope) => {
@@ -115,20 +130,25 @@ const statementHandler = {
       const newScope = new Scope('loop', scope);
       const result = evaluate(node.body, newScope);
 
-      if (result === BREAK) break;
-      else if (result === CONTINUE) continue;
-      else if (result === RETURN_SINGAL) return result;
+      if (result instanceof Break) break;
+      else if (result instanceof Continue) continue;
+      else if (result instanceof Return) return result;
     }
+
+    return undefined;
   },
 
   DoWhileStatement: (node: ESTree.DoWhileStatement, scope: Scope) => {
     do {
       const newScope = new Scope('loop', scope);
       const result = evaluate(node.body, newScope);
-      if (result === BREAK) break;
-      else if (result === CONTINUE) continue;
-      else if (result === RETURN_SINGAL) return result;
+
+      if (result instanceof Break) break;
+      else if (result instanceof Continue) continue;
+      else if (result instanceof Return) return result;
     } while (evaluate(node.test, scope));
+
+    return undefined;
   },
 
   ForStatement: (node: ESTree.ForStatement, scope: Scope) => {
@@ -141,10 +161,13 @@ const statementHandler = {
       node.update ? evaluate(node.update, newScope) : void 0
     ) {
       const result = evaluate(node.body, newScope);
-      if (result === BREAK) break;
-      else if (result === CONTINUE) continue;
-      else if (result === RETURN_SINGAL) return result;
+
+      if (result instanceof Break) break;
+      else if (result instanceof Continue) continue;
+      else if (result instanceof Return) return result;
     }
+
+    return undefined;
   },
 
   ForInStatement: (node: ESTree.ForInStatement, scope: Scope) => {
@@ -158,10 +181,13 @@ const statementHandler = {
 
       scope.declare(kind, name, value);
       const result = evaluate(node.body, newScope);
-      if (result === BREAK) break;
-      else if (result === CONTINUE) continue;
-      else if (result === RETURN_SINGAL) return result;
+
+      if (result instanceof Break) break;
+      else if (result instanceof Continue) continue;
+      else if (result instanceof Return) return result;
     }
+
+    return undefined;
   },
 
   ForOfStatement: (node: ESTree.ForOfStatement, _scope: Scope) => {

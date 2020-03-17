@@ -1,20 +1,32 @@
+/* eslint-disable max-classes-per-file */
 /* eslint-disable no-underscore-dangle */
 import * as ESTree from 'estree';
 import { Scope } from './scope';
 import evaluate from './eval';
 
 /** Break 标志 */
-export const BREAK = Symbol('BREAK');
+export class Break {
+  constructor(public label?: string) {}
+}
+
 /** Continue 标志 */
-export const CONTINUE = Symbol('CONTINUE');
+export class Continue {
+  constructor(public label?: string) {}
+}
+
 /** Return 标志 */
-export const RETURN_SINGAL: { result: any } = { result: undefined };
+export class Return {
+  constructor(public result: any) {}
+}
 
 /** 获得代码位置 */
-export const getLocation = (node: ESTree.Node, type: 'start' | 'end') => {
+export const getStack = (
+  node: ESTree.Node,
+  type: 'start' | 'end' = 'start'
+) => {
   const loc = node.loc?.[type];
 
-  return loc ? `${loc.line}:${loc.column}` : '';
+  return loc ? `\n    at ${loc.line}:${loc.column}` : '';
 };
 
 /** 获得 this */
@@ -49,7 +61,7 @@ export const getFunction = (
     const result = evaluate(node.body, functionScope);
 
     // 如果函数体存在返回值，则返回
-    if (result === RETURN_SINGAL) return result.result;
+    if (result instanceof Return) return result.result;
   };
 
 /** 额外处理声明 */

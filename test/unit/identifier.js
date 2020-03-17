@@ -217,26 +217,43 @@ it('undefined and null test', () => {
 });
 
 describe('function', () => {
-  it("'s proto can be override", () => {
-    const a = function(text) {};
+  describe("'s prototype", () => {
+    // it('can be set', () => {
+    //   function a() {}
 
-    a.prototype = {
-      toString() {
-        return JSON.stringify(this);
-      },
-      valueOf() {
-        return 1;
-      }
-    };
+    //   a.prototype = {
+    //     say: function() {}
+    //   };
 
-    const b = new a();
+    //   const b = new a();
 
-    expect(typeof a).to.be.equal('function');
-    expect(b.__proto__).to.be.equal(a.prototype);
-    expect(typeof b.toString).to.be.equal('function');
-    expect(typeof b.valueOf).to.be.equal('function');
-    expect(b.toString).to.be.equal(a.prototype.toString);
-    expect(b.valueOf).to.be.equal(a.prototype.valueOf);
-    expect(b + 1).to.be.equal(2);
+    //   expect(typeof a).to.be.equal('function');
+    //   expect(typeof b.say).to.be.equal('function');
+    //   expect(b.__proto__).to.be.equal(a.prototype);
+    //   expect(b.__proto__.say).to.be.equal(b.say);
+    // });
+
+    it('can be override', () => {
+      const a = function(text) {};
+
+      a.prototype = {
+        toString() {
+          return JSON.stringify(this);
+        },
+        valueOf() {
+          return 1;
+        }
+      };
+
+      const b = new a();
+
+      expect(typeof a).to.be.equal('function');
+      expect(b.__proto__).to.be.equal(a.prototype);
+      expect(typeof b.toString).to.be.equal('function');
+      expect(typeof b.valueOf).to.be.equal('function');
+      expect(b.toString).to.be.equal(a.prototype.toString);
+      expect(b.valueOf).to.be.equal(a.prototype.valueOf);
+      expect(b + 1).to.be.equal(2);
+    });
   });
 });

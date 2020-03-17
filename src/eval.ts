@@ -2,7 +2,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable consistent-return */
 import * as ESTree from 'estree';
-import { BREAK, CONTINUE, RETURN_SINGAL, handleDeclaration } from './common';
+import { Break, Continue, Return, handleDeclaration } from './common';
 import { EvaluateFunc, EvaluateMap } from './type';
 import { Scope } from './scope';
 import declarationHandler from './declaration';
@@ -45,9 +45,15 @@ evaluateMap = Object.assign(
       for (const statement of node.consequent) {
         const result = evaluate(statement, scope);
         // 执行停止并返回相应状态
-        if (result === BREAK || result === CONTINUE || result === RETURN_SINGAL)
+        if (
+          result instanceof Break ||
+          result instanceof Continue ||
+          result instanceof Return
+        )
           return result;
       }
+
+      return undefined;
     },
 
     CatchClause: (node: ESTree.CatchClause, scope: Scope) =>
