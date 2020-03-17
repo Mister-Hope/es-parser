@@ -2,8 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-bitwise */
 import * as ESTree from 'estree';
-import { Scope, Variable } from './scope';
 import { getFunction, getMember, getMemberVariable, getThis } from './common';
+import { Scope } from './scope';
+import { Variable } from './variable';
 import evaluate from './eval';
 
 const expressionHandler = {
