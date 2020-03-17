@@ -12,16 +12,13 @@ export interface Variable {
 
 /** 作用域变量 */
 class ScopeVariable implements Variable {
-  /** 变量声明类型 */
-  private declarationType: DeclarationType;
+  constructor(
+    /** 变量声明类型 */
 
-  /** 变量值 */
-  private _value: any;
-
-  constructor(declarationType: DeclarationType, value: any) {
-    this.declarationType = declarationType;
-    this._value = value;
-  }
+    private declarationType: DeclarationType,
+    /** 变量值 */
+    private _value: any
+  ) {}
 
   public get value() {
     return this._value;
@@ -67,11 +64,12 @@ export class Scope {
   /** 父作用域 */
   public parent: Scope | null;
 
-  /** 作用域类型 */
-  public readonly type: ScopeType;
-
-  constructor(type: ScopeType, parent?: Scope, ctx?: any) {
-    this.type = type;
+  constructor(
+    /** 作用域类型 */
+    public readonly type: ScopeType,
+    parent?: Scope,
+    ctx?: any
+  ) {
     this.this = ctx || undefined;
     this.parent = parent || null;
     this.variables = {};
