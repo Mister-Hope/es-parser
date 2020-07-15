@@ -1,6 +1,7 @@
 # es-parser
 
 [![Author: Mr.Hope](https://img.shields.io/badge/作者-Mr.Hope-blue.svg?style=for-the-badge)](https://mrhope.site)
+
 <!-- [![License](https://img.shields.io/npm/l/es-parser.svg?style=for-the-badge)](https://github.com/Mister-Hope/es-parser/blob/master/LICENSE) -->
 
 一个 110KB 大小的 JS 解释器/运行器
@@ -12,13 +13,13 @@ A 110KB size JS parser and runner.
 ### TypeScript
 
 ```ts
-import * as esParser from 'es-parser';
+import * as esParser from "es-parser";
 ```
 
 ### JavaScript
 
 ```js
-const esParser = require('es-parser');
+const esParser = require("es-parser");
 ```
 
 ## API
@@ -38,7 +39,8 @@ interface GlobalMap{
 ```js
 esParser.run("console.log('hello world')");
 
-esParser.run(`
+esParser.run(
+  `
 const progress = wx.downloadFile({
   url: 'https://www.baidu.com/img/bd_logo1.png',
   success: res => {
@@ -56,7 +58,9 @@ const progress = wx.downloadFile({
 progress.onProgressUpdate(res => {
   wx.showLoading({ title: \`下载中\${Math.round(res.progress)}%\` });
 });
-`,{ wx });
+`,
+  { wx }
+);
 // this will pass the global variable `wx` to the parser
 ```
 

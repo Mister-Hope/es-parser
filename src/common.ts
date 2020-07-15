@@ -1,8 +1,8 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-underscore-dangle */
-import * as ESTree from 'estree';
-import { Scope } from './scope';
-import evaluate from './eval';
+import * as ESTree from "estree";
+import { Scope } from "./scope";
+import evaluate from "./eval";
 
 /** Break 标志 */
 export class Break {
@@ -22,11 +22,11 @@ export class Return {
 /** 获得代码位置 */
 export const getStack = (
   node: ESTree.Node,
-  type: 'start' | 'end' = 'start'
-) => {
+  type: "start" | "end" = "start"
+): string => {
   const loc = node.loc?.[type];
 
-  return loc ? `\n    at ${loc.line}:${loc.column}` : '';
+  return loc ? `\n    at ${loc.line}:${loc.column}` : "";
 };
 
 /** 获得 this */
@@ -39,10 +39,10 @@ export const getFunction = (
   scope: Scope,
   isArrow = false
 ) =>
-  function Function(...args: any[]) {
+  function Function(...args: any[]): Return | void {
     /** 函数作用域 */
     const functionScope = new Scope(
-      'function',
+      "function",
       scope,
       // 普通函数获得当前this，箭头函数获得父级的 this 表达式
       isArrow ? getThis(scope) : this
@@ -55,7 +55,7 @@ export const getFunction = (
     });
 
     // 声明 arguments
-    functionScope.const('arguments', args);
+    functionScope.const("arguments", args);
 
     // 解析函数体
     const result = evaluate(node.body, functionScope);
@@ -68,14 +68,14 @@ export const getFunction = (
 export const handleDeclaration = (
   nodes: (ESTree.Directive | ESTree.Statement | ESTree.ModuleDeclaration)[],
   scope: Scope
-) => {
+): void => {
   // 先将 var 变量声明为 undefined
   for (const node of nodes)
-    if (node.type === 'VariableDeclaration' && node.kind === 'var')
+    if (node.type === "VariableDeclaration" && node.kind === "var")
       // 依次声明变量
       for (const declarator of node.declarations)
         scope.declare(
-          'var',
+          "var",
           /** 变量名称 */
           (declarator.id as ESTree.Identifier).name,
           undefined
@@ -83,11 +83,11 @@ export const handleDeclaration = (
 
   // 再执行函数声明
   for (const node of nodes)
-    if (node.type === 'FunctionDeclaration') evaluate(node, scope);
+    if (node.type === "FunctionDeclaration") evaluate(node, scope);
 };
 
 /** 返回正确的成员 */
-export const getMember = (node: ESTree.MemberExpression, scope: Scope) => {
+export const getMember = (node: ESTree.MemberExpression, scope: Scope): any => {
   /** 解析得到的所在对象 */
   const object = evaluate(node.object, scope);
   /** 对应的属性名称 */
@@ -99,7 +99,7 @@ export const getMember = (node: ESTree.MemberExpression, scope: Scope) => {
 
   /** 真正的对象 */
   const realObject =
-    typeof object === 'function' &&
+    typeof object === "function" &&
     object.__props__ &&
     object[property] === undefined
       ? object.__props__
@@ -112,16 +112,16 @@ export const getMember = (node: ESTree.MemberExpression, scope: Scope) => {
 export const getMemberVariable = (
   node: ESTree.MemberExpression,
   scope: Scope
-) => {
+): any => {
   const [realObject, property] = getMember(node, scope);
 
   // 生成变量对象
   return {
-    get value() {
+    get value(): any {
       return realObject[property];
     },
     set value(value: any) {
       realObject[property] = value;
-    }
+    },
   };
 };

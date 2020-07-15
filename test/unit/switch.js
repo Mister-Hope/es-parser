@@ -1,5 +1,5 @@
 // @ts-nocheck
-const testSwitch = value => {
+const testSwitch = (value) => {
   let temp = 0;
   switch (value) {
     case 0:
@@ -26,23 +26,23 @@ const testSwitch = value => {
   return temp;
 };
 
-it('should handle default', () => {
+it("should handle default", () => {
   expect(testSwitch(-1)).to.be.equal(1);
 });
 
-it('should handle break', () => {
+it("should handle break", () => {
   expect(testSwitch(0)).to.be.equal(6);
   expect(testSwitch(1)).to.be.equal(5);
 });
 
-it('should handle fallthrough', () => {
+it("should handle fallthrough", () => {
   expect(testSwitch(3)).to.be.equal(2);
 });
 
-it('should fallthrough to default', () => {
+it("should fallthrough to default", () => {
   expect(testSwitch(5)).to.be.equal(2);
 });
 
-it('should handle return', () => {
+it("should handle return", () => {
   expect(testSwitch(2)).to.be.equal(4);
 });

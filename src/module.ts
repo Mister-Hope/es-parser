@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import * as ESTree from 'estree';
-import { Scope } from './scope';
+import * as ESTree from "estree";
+import { Scope } from "./scope";
 
 const moduleHandler = {
   MethodDefinition: (node: ESTree.MethodDefinition, _scope: Scope) => {
@@ -41,7 +41,7 @@ const moduleHandler = {
   },
   ExportSpecifier: (node: ESTree.ExportSpecifier, _scope: Scope) => {
     throw new Error(`${node.type} 未实现`);
-  }
+  },
 };
 
 export default moduleHandler;

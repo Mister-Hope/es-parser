@@ -2,11 +2,11 @@ import {
   DeclarationType,
   FunctionVariable,
   ScopeVariable,
-  Variable
-} from './variable';
+  Variable,
+} from "./variable";
 
 /** 作用域类型 */
-export type ScopeType = 'function' | 'loop' | 'switch' | 'block';
+export type ScopeType = "function" | "loop" | "switch" | "block";
 
 /** 作用域 */
 export class Scope {
@@ -59,7 +59,7 @@ export class Scope {
         `SyntaxError: Identifier '${varName}' has already been declared`
       );
 
-    this.variables[name] = new ScopeVariable('let', value);
+    this.variables[name] = new ScopeVariable("let", value);
   }
 
   /**
@@ -84,7 +84,7 @@ export class Scope {
         `SyntaxError: Identifier '${varName}' has already been declared`
       );
 
-    this.variables[name] = new ScopeVariable('const', value);
+    this.variables[name] = new ScopeVariable("const", value);
   }
 
   /**
@@ -100,7 +100,7 @@ export class Scope {
     // eslint-disable-next-line
     let scope: Scope = this;
 
-    while (scope.parent !== null && scope.type !== 'function')
+    while (scope.parent !== null && scope.type !== "function")
       scope = scope.parent;
 
     if (scope.variables[name])
@@ -108,7 +108,7 @@ export class Scope {
         `SyntaxWarning: Identifier '${varName}' has already been declared`
       );
 
-    this.variables[name] = new ScopeVariable('var', value);
+    this.variables[name] = new ScopeVariable("var", value);
   }
 
   /** 声明函数 */

@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 /** 声明类型 */
-export type DeclarationType = 'const' | 'let' | 'var' | 'function';
+export type DeclarationType = "const" | "let" | "var" | "function";
 
 /** 变量 */
 export interface Variable {
@@ -23,8 +23,8 @@ export class ScopeVariable implements Variable {
 
   public set value(value: any) {
     // const 不能二次赋值
-    if (this.declarationType === 'const')
-      throw new TypeError('Assignment to constant variable.');
+    if (this.declarationType === "const")
+      throw new TypeError("Assignment to constant variable.");
 
     this._value = value;
   }

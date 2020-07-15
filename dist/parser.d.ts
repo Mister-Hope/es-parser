@@ -1,4 +1,4 @@
-import * as acorn from 'acorn';
+import * as acorn from "acorn";
 
 export function parse(codeString: string): acorn.Node;
 export function run(codeString: string, globalVar?: Record<string, any>): any;

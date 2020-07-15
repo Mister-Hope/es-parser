@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import * as ESTree from 'estree';
-import { Scope } from './scope';
+import * as ESTree from "estree";
+import { Scope } from "./scope";
 
 const patternHandler = {
   ObjectPattern: (node: ESTree.ObjectPattern, _scope: Scope) => {
@@ -17,7 +17,7 @@ const patternHandler = {
 
   AssignmentPattern: (node: ESTree.AssignmentPattern, _scope: Scope) => {
     throw new Error(`${node.type} 未实现`);
-  }
+  },
 };
 
 export default patternHandler;

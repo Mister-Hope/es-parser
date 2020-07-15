@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/", // 打包到的目录
+    "outDir": "./dist/",
     "allowJs": false,
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
@@ -31,6 +31,6 @@
     "strict": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "target": "es5",
-  },
+    "target": "es5"
+  }
 }

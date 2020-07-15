@@ -1,13 +1,13 @@
-import * as ESTree from 'estree';
-import * as acorn from 'acorn';
-import { Scope } from './scope';
+import * as ESTree from "estree";
+import * as acorn from "acorn";
+import { Scope } from "./scope";
 
-import evaluate from './eval';
+import evaluate from "./eval";
 
 const options: acorn.Options = {
   ecmaVersion: 6,
-  sourceType: 'script',
-  locations: true
+  sourceType: "script",
+  locations: true,
 };
 
 // 导出默认对象
@@ -49,7 +49,7 @@ const globalVar: { [key: string]: any } = {
   Array,
   JSON,
   Promise,
-  Infinity
+  Infinity,
 };
 
 /** 解析代码 */
@@ -61,7 +61,7 @@ export const run = (
   addtionalGlobalVar: Record<string, any> = {}
 ) => {
   // eslint-disable-next-line no-invalid-this
-  const scope = new Scope('block', undefined, this);
+  const scope = new Scope("block", undefined, this);
 
   // 定义默认全局变量
   for (const name of Object.getOwnPropertyNames(globalVar))
@@ -74,16 +74,16 @@ export const run = (
   // 定义 module
   const $exports = {};
   const $module = { exports: $exports };
-  scope.const('module', $module);
-  scope.const('exports', $exports);
+  scope.const("module", $module);
+  scope.const("exports", $exports);
 
   evaluate((parse(code) as unknown) as ESTree.Node, scope);
 
   // exports
-  return scope.getValue('module').exports;
+  return scope.getValue("module").exports;
 };
 
 export default {
   parse,
-  run
+  run,
 };

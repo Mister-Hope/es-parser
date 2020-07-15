@@ -1,28 +1,28 @@
 // @ts-nocheck
-describe('var declaration', () => {
-  it('variables can be declared by var', () => {
+describe("var declaration", () => {
+  it("variables can be declared by var", () => {
     let a;
     expect(a).to.be.equal(undefined);
   });
 
-  it('uninited var variables can be assigned', () => {
+  it("uninited var variables can be assigned", () => {
     let a;
     a = 1;
     expect(a).to.be.equal(1);
   });
 
-  it('variables can be declared and inited by var', () => {
+  it("variables can be declared and inited by var", () => {
     const b = 1;
     expect(b).to.be.equal(1);
   });
 
-  it('var variables can be reassigned', () => {
+  it("var variables can be reassigned", () => {
     let b = 1;
     b = 2;
     expect(b).to.be.equal(2);
   });
 
-  it('muti variables can be declaration in one var statement', () => {
+  it("muti variables can be declaration in one var statement", () => {
     const a = 1;
     const b = 2;
     let c;
@@ -33,19 +33,19 @@ describe('var declaration', () => {
     expect(d).to.be.equal(undefined);
   });
 
-  it('var variables is undefined before declaration', () => {
+  it("var variables is undefined before declaration", () => {
     expect(a).to.be.equal(undefined);
     var a;
   });
 });
 
-describe('let declaration', () => {
-  it('variables can be declared by let', () => {
+describe("let declaration", () => {
+  it("variables can be declared by let", () => {
     let a;
     expect(a).to.be.equal(undefined);
   });
 
-  it('uninited let variables can be assigned', () => {
+  it("uninited let variables can be assigned", () => {
     let a;
     a = 1;
     expect(a).to.be.equal(1);
@@ -61,18 +61,18 @@ describe('let declaration', () => {
     try {
       console.log(a);
     } catch (err) {
-      expect(err.message).to.be.equal('a is not defined');
+      expect(err.message).to.be.equal("a is not defined");
     }
     expect(b).to.be.equal(2);
   });
 
-  it('let variables can be reassigned', () => {
+  it("let variables can be reassigned", () => {
     let a = 1;
     a = 2;
     expect(a).to.be.equal(2);
   });
 
-  it('muti variables can be declaration in one let statement', () => {
+  it("muti variables can be declaration in one let statement", () => {
     const a = 1;
     const b = 2;
     let c;
@@ -84,7 +84,7 @@ describe('let declaration', () => {
   });
 });
 
-describe('const declaration', () => {
+describe("const declaration", () => {
   // WARNING: 这样写会直接导致 estree 解析失败，目前没有办法
   /*
    * try {
@@ -105,7 +105,7 @@ describe('const declaration', () => {
 
   {
     const a = 1;
-    it('const variable must be inited when declared', () => {
+    it("const variable must be inited when declared", () => {
       expect(a).to.be.equal(1);
     });
   }
@@ -115,7 +115,7 @@ describe('const declaration', () => {
       const a = 1;
       a = 2;
     } catch (err) {
-      expect(err.message).to.be.equal('Assignment to constant variable.');
+      expect(err.message).to.be.equal("Assignment to constant variable.");
     }
   });
 
@@ -124,7 +124,7 @@ describe('const declaration', () => {
     expect(a).to.be.equal(2);
   });
 
-  it('muti variables can be declaration in one const statement', () => {
+  it("muti variables can be declaration in one const statement", () => {
     const b = 3;
     const c = 4;
     expect(b).to.be.equal(3);
@@ -136,17 +136,17 @@ it("visiting undefined indetifier should throw error in 'use strict'", () => {
   try {
     console.log(a);
   } catch (err) {
-    expect(err.message).to.be.equal('a is not defined');
+    expect(err.message).to.be.equal("a is not defined");
   }
 });
 
-describe('function declaration', () => {
-  it('type of function should be function', () => {
+describe("function declaration", () => {
+  it("type of function should be function", () => {
     function a() {}
-    expect(typeof a).to.be.equal('function');
+    expect(typeof a).to.be.equal("function");
   });
 
-  it('should move FunctionDeclaration to the top of the scope', () => {
+  it("should move FunctionDeclaration to the top of the scope", () => {
     let counter = 0;
     hoisted(); // ReferenceError: hoisted is not defined
     function hoisted() {
@@ -155,49 +155,49 @@ describe('function declaration', () => {
     expect(counter).to.be.equal(1);
   });
 
-  it('function can have property', () => {
+  it("function can have property", () => {
     function a() {
       return 0;
     }
-    expect(typeof a).to.be.equal('function');
+    expect(typeof a).to.be.equal("function");
     expect(a()).to.be.equal(0);
     expect(a.a).to.be.equal(undefined);
   });
 
-  it('function can add property', () => {
+  it("function can add property", () => {
     a.a = 1;
     function a() {
       return 0;
     }
-    expect(typeof a).to.be.equal('function');
+    expect(typeof a).to.be.equal("function");
     expect(a()).to.be.equal(0);
     expect(a.a).to.be.equal(1);
   });
 
-  it('function can change property', () => {
+  it("function can change property", () => {
     a.a = 1;
     function a() {
       return 0;
     }
-    expect(typeof a).to.be.equal('function');
+    expect(typeof a).to.be.equal("function");
     expect(a()).to.be.equal(0);
     expect(a.a).to.be.equal(1);
     a.a = 2;
-    expect(typeof a).to.be.equal('function');
+    expect(typeof a).to.be.equal("function");
     expect(a()).to.be.equal(0);
     expect(a.a).to.be.equal(2);
   });
 
-  it('function can delete property', () => {
+  it("function can delete property", () => {
     a.a = 1;
     function a() {
       return 0;
     }
-    expect(typeof a).to.be.equal('function');
+    expect(typeof a).to.be.equal("function");
     expect(a()).to.be.equal(0);
     expect(a.a).to.be.equal(1);
     delete a.a;
-    expect(typeof a).to.be.equal('function');
+    expect(typeof a).to.be.equal("function");
     expect(a()).to.be.equal(0);
     expect(a.a).to.be.equal(undefined);
   });

@@ -3,13 +3,6 @@ root: true
 env:
   es6: true
 
-parserOptions:
-  ecmaVersion: 6
-  project: "./tsconfig.json"
-  sourceType: module
-  ecmaFeatures:
-    modules: true
-
 extends:
   - eslint:all
   - plugin:prettier/recommended
@@ -18,19 +11,11 @@ plugins:
   - prettier
 
 rules:
-  no-useless-constructor:
-    - off
-
-  arrow-parens:
-    - error
-    - as-needed
-
   class-methods-use-this:
     - off
 
   comma-dangle:
-    - error
-    - never
+    - off
 
   complexity:
     - warn
@@ -50,19 +35,18 @@ rules:
     - error
     - min: 2
       exceptions:
+        - a
+        - b
+        - h
         - i
         - j
-        - x
-        - y
+        - k
 
   implicit-arrow-linebreak:
     - off
 
   indent:
     - off
-    - 2
-    - ignoredNodes:
-        - ConditionalExpression
 
   init-declarations:
     - off
@@ -135,6 +119,9 @@ rules:
   no-unused-vars:
     - off
 
+  no-useless-constructor:
+    - off
+
   no-warning-comments:
     - warn
 
@@ -182,8 +169,17 @@ overrides:
     plugins:
       - "@typescript-eslint"
 
+    parserOptions:
+      parser: "@typescript-eslint/parser"
+
     rules:
-      "@typescript-eslint/explicit-function-return-type": off
+      "@typescript-eslint/explicit-function-return-type":
+        - warn
+        - allowTypedFunctionExpressions: true
+
+      "@typescript-eslint/naming-convention":
+        - error
+
       "@typescript-eslint/no-explicit-any": off
 
   - files:

@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-continue */
 /* eslint-disable consistent-return */
-import * as ESTree from 'estree';
-import { Break, Continue, Return, handleDeclaration } from './common';
-import { EvaluateFunc, EvaluateMap } from './type';
-import { Scope } from './scope';
-import declarationHandler from './declaration';
-import expressionHandler from './expression';
-import moduleHandler from './module';
-import patternHandler from './pattern';
-import statementHandler from './statement';
+import * as ESTree from "estree";
+import { Break, Continue, Return, handleDeclaration } from "./common";
+import { EvaluateFunc, EvaluateMap } from "./type";
+import { Scope } from "./scope";
+import declarationHandler from "./declaration";
+import expressionHandler from "./expression";
+import moduleHandler from "./module";
+import patternHandler from "./pattern";
+import statementHandler from "./statement";
 
 /** 操作列表 */
 // eslint-disable-next-line prefer-const
 let evaluateMap: EvaluateMap;
 
 /** 执行操作 */
-const evaluate = (node: ESTree.Node, scope: Scope, arg?: any) =>
+const evaluate = (node: ESTree.Node, scope: Scope, arg?: any): any =>
   (evaluateMap[node.type] as EvaluateFunc)(node, scope, arg);
 
 // eslint-disable-next-line prefer-object-spread
@@ -25,7 +25,7 @@ evaluateMap = Object.assign(
     /** 标识符 */
     Identifier: (node: ESTree.Identifier, scope: Scope) =>
       // 处理 undefined
-      node.name === 'undefined' ? undefined : scope.getValue(node.name),
+      node.name === "undefined" ? undefined : scope.getValue(node.name),
 
     /** 文字表达式 */
     Literal: (node: ESTree.Literal, _scope: Scope) => node.value,
@@ -36,7 +36,7 @@ evaluateMap = Object.assign(
 
       // 依次执行每一行
       for (const node of program.body)
-        if (node.type !== 'FunctionDeclaration') evaluate(node, scope);
+        if (node.type !== "FunctionDeclaration") evaluate(node, scope);
     },
 
     /** switch 中的 case 表达式 */
@@ -60,11 +60,11 @@ evaluateMap = Object.assign(
       evaluate(node.body, scope),
 
     VariableDeclarator: (_node: ESTree.VariableDeclarator, _scope: Scope) => {
-      throw new Error('不应出现');
+      throw new Error("不应出现");
     },
 
     Property: (_node: ESTree.Property, _scope: Scope, _computed: boolean) => {
-      throw new Error('不应出现');
+      throw new Error("不应出现");
     },
 
     Super: (node: ESTree.Super, _scope: Scope) => {
@@ -81,7 +81,7 @@ evaluateMap = Object.assign(
 
     ClassBody: (node: ESTree.ClassBody, _scope: Scope) => {
       throw new Error(`${node.type} 未实现`);
-    }
+    },
   },
   declarationHandler,
   expressionHandler,
