@@ -39,6 +39,7 @@ export const getFunction = (
   scope: Scope,
   isArrow = false
 ) =>
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   function Function(...args: any[]): Return | void {
     /** 函数作用域 */
     const functionScope = new Scope(

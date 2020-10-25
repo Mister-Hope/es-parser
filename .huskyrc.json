@@ -1,5 +1,0 @@
-{
-  "hooks": {
-    "pre-commit": "yarn run build && git add dist/parser.js && git add dist/parser.js.map && lint-staged"
-  }
-}

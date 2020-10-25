@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-bitwise */
+
 import * as ESTree from "estree";
 import { getFunction, getMember, getMemberVariable, getThis } from "./common";
 import { Scope } from "./scope";

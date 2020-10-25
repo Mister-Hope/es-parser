@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import * as ESTree from "estree";
 import { Scope } from "./scope";
 
@@ -73,6 +74,8 @@ export interface NodeTypeMap {
 
 export type EvaluateMap = {
   [key in ESTree.Node["type"]]: (
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     node: NodeTypeMap[key],
     scope: Scope,
     arg?: any

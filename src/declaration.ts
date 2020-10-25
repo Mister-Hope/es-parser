@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+
 import * as ESTree from "estree";
 import { getFunction, getStack } from "./common";
 import { Scope } from "./scope";

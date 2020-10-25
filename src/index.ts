@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import * as ESTree from "estree";
 import * as acorn from "acorn";
 import { Scope } from "./scope";
@@ -53,13 +54,13 @@ const globalVar: { [key: string]: any } = {
 };
 
 /** 解析代码 */
-export const parse = (code: string) => acorn.parse(code, options);
+export const parse = (code: string): acorn.Node => acorn.parse(code, options);
 
 /** 运行代码 */
 export const run = (
   code: string,
   addtionalGlobalVar: Record<string, any> = {}
-) => {
+): any => {
   // eslint-disable-next-line no-invalid-this
   const scope = new Scope("block", undefined, this);
 
