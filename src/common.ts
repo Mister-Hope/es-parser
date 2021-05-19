@@ -1,5 +1,3 @@
-/* eslint-disable max-classes-per-file */
-/* eslint-disable no-underscore-dangle */
 import * as ESTree from "estree";
 import { Scope } from "./scope";
 import evaluate from "./eval";
@@ -38,7 +36,7 @@ export const getFunction = (
   node: ESTree.BaseFunction,
   scope: Scope,
   isArrow = false
-) =>
+): any =>
   // eslint-disable-next-line @typescript-eslint/naming-convention
   function Function(...args: any[]): Return | void {
     /** 函数作用域 */

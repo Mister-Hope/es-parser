@@ -78,7 +78,7 @@ export const run = (
   scope.const("module", $module);
   scope.const("exports", $exports);
 
-  evaluate((parse(code) as unknown) as ESTree.Node, scope);
+  evaluate(parse(code) as unknown as ESTree.Node, scope);
 
   // exports
   return scope.getValue("module").exports;

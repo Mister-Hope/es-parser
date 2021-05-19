@@ -4,158 +4,12 @@ env:
   es6: true
 
 extends:
-  - eslint:all
+  - eslint:recommended
   - plugin:prettier/recommended
 
-plugins:
-  - prettier
-
-rules:
-  class-methods-use-this:
-    - off
-
-  comma-dangle:
-    - off
-
-  complexity:
-    - warn
-    - max: 25
-
-  capitalized-comments:
-    - off
-
-  curly:
-    - error
-    - multi
-
-  global-require:
-    - off
-
-  id-length:
-    - error
-    - min: 2
-      exceptions:
-        - a
-        - b
-        - h
-        - i
-        - j
-        - k
-
-  implicit-arrow-linebreak:
-    - off
-
-  indent:
-    - off
-
-  init-declarations:
-    - off
-
-  function-call-argument-newline:
-    - error
-    - consistent
-
-  line-comment-position:
-    - off
-
-  max-lines:
-    - warn
-    - 500
-
-  max-lines-per-function:
-    - warn
-    - 80
-
-  max-statements:
-    - warn
-    - 25
-
-  new-cap:
-    - off
-
-  nonblock-statement-body-position:
-    - error
-    - any
-
-  no-console:
-    - off
-
-  no-debugger:
-    - off
-
-  no-inline-comments:
-    - off
-
-  no-magic-numbers:
-    - off
-
-  no-multi-assign:
-    - off
-
-  no-nested-ternary:
-    - off
-
-  no-param-reassign:
-    - error
-    - props: false
-
-  no-plusplus:
-    - error
-    - allowForLoopAfterthoughts: true
-
-  no-sync:
-    - off
-
-  no-ternary:
-    - off
-
-  no-underscore-dangle:
-    - error
-    - allowAfterThis: true
-
-  no-undefined:
-    - off
-
-  no-unused-vars:
-    - off
-
-  no-useless-constructor:
-    - off
-
-  no-warning-comments:
-    - warn
-
-  object-curly-spacing:
-    - off
-
-  one-var:
-    - error
-    - never
-
-  padded-blocks:
-    - error
-    - never
-
-  prefer-destructuring:
-    - error
-    - object: true
-      array: false
-
-  prefer-named-capture-group:
-    - off
-
-  quotes:
-    - off
-
-  radix:
-    - error
-    - as-needed
-
-  sort-keys:
-    - off
-
-  strict:
-    - off
+ignorePatterns:
+  - dist/
+  - test/**/*.js
 
 overrides:
   - files:
@@ -164,30 +18,90 @@ overrides:
     extends:
       - plugin:@typescript-eslint/eslint-recommended
       - plugin:@typescript-eslint/recommended
-      - prettier/@typescript-eslint
+      - plugin:@typescript-eslint/recommended-requiring-type-checking
+      - plugin:prettier/recommended
 
     plugins:
       - "@typescript-eslint"
 
     parserOptions:
       parser: "@typescript-eslint/parser"
+      project:
+        - "./tsconfig.json"
 
     rules:
       "@typescript-eslint/explicit-function-return-type":
         - warn
         - allowTypedFunctionExpressions: true
 
-      "@typescript-eslint/naming-convention":
-        - error
+      "@typescript-eslint/explicit-module-boundary-types":
+        - warn
+        - allowArgumentsExplicitlyTypedAsAny: true
 
-      "@typescript-eslint/no-explicit-any": off
+      "@typescript-eslint/naming-convention":
+        - warn
+        - selector: default
+          format:
+            - camelCase
+            - PascalCase
+          leadingUnderscore: allow
+          trailingUnderscore: allow
+
+        - selector:
+            - variable
+          format:
+            - camelCase
+            - UPPER_CASE
+          leadingUnderscore: allow
+          trailingUnderscore: allow
+
+        - selector:
+            - parameter
+          format:
+            - camelCase
+            - PascalCase
+          leadingUnderscore: allow
+          trailingUnderscore: allow
+
+        - selector:
+            - property
+          format:
+            - camelCase
+            - PascalCase
+            - UPPER_CASE
+          leadingUnderscore: allow
+          trailingUnderscore: allow
+
+        - selector: typeLike
+          format:
+            - PascalCase
+
+      "@typescript-eslint/no-explicit-any":
+        - off
+
+      "@typescript-eslint/no-unsafe-assignment":
+        - off
+
+      "@typescript-eslint/no-unsafe-member-access":
+        - off
+
+      "@typescript-eslint/no-unsafe-return":
+        - off
 
   - files:
-      - "test/**"
+      - "**/__tests__/**/*.spec.{j,t}s?(x)"
 
     env:
-      mocha: true
+      jest: true
       node: true
+
+    rules:
+      "@typescript-eslint/naming-convention":
+        - off
+      "@typescript-eslint/no-non-null-assertion":
+        - off
+      "@typescript-eslint/no-unsafe-call":
+        - off
 
   - files:
       - "webpack.config.js"

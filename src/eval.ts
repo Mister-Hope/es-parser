@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-continue */
-/* eslint-disable consistent-return */
-
 import * as ESTree from "estree";
 import { Break, Continue, Return, handleDeclaration } from "./common";
 import { EvaluateFunc, EvaluateMap } from "./type";

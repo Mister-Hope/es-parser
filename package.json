@@ -8,15 +8,15 @@
     "build": "webpack",
     "commit": "yarn git-cz",
     "dev": "webpack --watch",
-    "test": "mocha -r ts-node/register test/unit/**/*.ts",
-    "test:parser": "ts-node ./test/parser.ts",
-    "test:dev": "mocha -r ts-node/register  --watch test/unit/**/*.ts",
-    "test:js": "mocha ./test/unit/index.js",
-    "parse": "node ./test/parse.js",
-    "debug": "mocha -r ts-node/register  --watch test/debug.ts",
     "lint": "prettier --check --write . && eslint --fix --ext .js,.ts .",
     "lint:check": "prettier --check . && eslint --ext .js,.ts .",
-    "prepare": "husky install"
+    "parse": "node ./test/parse.js",
+    "prepare": "husky install",
+    "test": "mocha -r ts-node/register test/unit/**/*.ts",
+    "test:debug": "mocha -r ts-node/register  --watch test/debug.ts",
+    "test:dev": "mocha -r ts-node/register  --watch test/unit/**/*.ts",
+    "test:js": "mocha ./test/unit/index.js",
+    "test:parser": "ts-node ./test/parser.ts"
   },
   "publishConfig": {
     "access": "public"

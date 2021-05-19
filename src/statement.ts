@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-continue */
-/* eslint-disable consistent-return */
-
 import * as ESTree from "estree";
 import { Break, Continue, Return, handleDeclaration } from "./common";
 import { Scope } from "./scope";
@@ -50,6 +45,7 @@ const statementHandler = {
 
   /** debugger 表达式 */
   DebuggerStatement: (_node: ESTree.DebuggerStatement, _scope: Scope): void => {
+    // eslint-disable-next-line no-debugger
     debugger;
   },
 
@@ -173,7 +169,6 @@ const statementHandler = {
   ForStatement: (node: ESTree.ForStatement, scope: Scope): Return | void => {
     for (
       const newScope = new Scope("loop", scope),
-        // eslint-disable-next-line sort-vars
         initVal = node.init ? evaluate(node.init, newScope) : null;
       node.test ? evaluate(node.test, newScope) : true;
       // eslint-disable-next-line no-void

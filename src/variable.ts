@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 /** 声明类型 */
 export type DeclarationType = "const" | "let" | "var" | "function";
 

@@ -52,7 +52,7 @@ export class Scope {
    * @param value 变量值
    * @returns 声明是否成功
    */
-  public let(varName: string, value: any) {
+  public let(varName: string, value: any): void {
     const name = `@${varName}`;
     if (this.variables[name])
       throw new SyntaxError(
@@ -69,8 +69,8 @@ export class Scope {
    * @param value 变量值
    * @returns 声明是否成功
    */
-  public const(varName: string, value: any) {
-    // `const a;` 这种写法会直接导致 acorn 解析失败
+  public const(varName: string, value: any): void {
+    // Note: `const a;` 这种写法会直接导致 acorn 解析失败
     /*
      * if (arguments.length === 1)
      *   throw new Error(
@@ -94,7 +94,7 @@ export class Scope {
    * @param value 变量值
    * @returns 声明是否成功
    */
-  public var(varName: string, value: any) {
+  public var(varName: string, value: any): void {
     const name = `@${varName}`;
 
     // eslint-disable-next-line
@@ -112,7 +112,7 @@ export class Scope {
   }
 
   /** 声明函数 */
-  public function(functionName: string, value: any) {
+  public function(functionName: string, value: any): void {
     const name = `@${functionName}`;
 
     this.variables[name] = new FunctionVariable(value);
@@ -130,7 +130,7 @@ export class Scope {
     declarationType: DeclarationType,
     varName: string,
     value: any
-  ) {
+  ): void {
     this[declarationType](varName, value);
   }
 }
