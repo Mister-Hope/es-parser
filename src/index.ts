@@ -2,8 +2,7 @@
 import * as ESTree from "estree";
 import * as acorn from "acorn";
 import { Scope } from "./scope";
-
-import evaluate from "./eval";
+import { evaluate } from "./eval";
 
 const options: acorn.Options = {
   ecmaVersion: 6,
@@ -82,9 +81,4 @@ export const run = (
 
   // exports
   return scope.getValue("module").exports;
-};
-
-export default {
-  parse,
-  run,
 };

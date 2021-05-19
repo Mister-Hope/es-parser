@@ -15,7 +15,7 @@
     "importHelpers": false,
     "inlineSourceMap": false,
     "inlineSources": false,
-    "listEmittedFiles": true,
+    "listEmittedFiles": false,
     "moduleResolution": "node",
     "module": "commonjs",
     "noEmitHelpers": true,

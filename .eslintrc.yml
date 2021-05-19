@@ -53,6 +53,7 @@ overrides:
             - variable
           format:
             - camelCase
+            - PascalCase
             - UPPER_CASE
           leadingUnderscore: allow
           trailingUnderscore: allow
@@ -107,7 +108,14 @@ overrides:
 
   - files:
       - "jest.config.js"
+      - "rollup.config.js"
       - "webpack.config.js"
 
     env:
       node: true
+
+  - files:
+      - "rollup.config.js"
+
+    parserOptions:
+      sourceType: module

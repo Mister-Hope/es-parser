@@ -1,6 +1,6 @@
 import * as ESTree from "estree";
 import { Scope } from "./scope";
-import evaluate from "./eval";
+import { evaluate } from "./eval";
 
 /** Break 标志 */
 export class Break {

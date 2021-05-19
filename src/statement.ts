@@ -1,7 +1,7 @@
 import * as ESTree from "estree";
 import { Break, Continue, Return, handleDeclaration } from "./common";
 import { Scope } from "./scope";
-import evaluate from "./eval";
+import { evaluate } from "./eval";
 
 const statementHandler = {
   /** 表达式 */
@@ -167,9 +167,11 @@ const statementHandler = {
   },
 
   ForStatement: (node: ESTree.ForStatement, scope: Scope): Return | void => {
+    const newScope = new Scope("loop", scope);
+
+    if (node.init) evaluate(node.init, newScope);
     for (
-      const newScope = new Scope("loop", scope),
-        initVal = node.init ? evaluate(node.init, newScope) : null;
+      ;
       node.test ? evaluate(node.test, newScope) : true;
       // eslint-disable-next-line no-void
       node.update ? evaluate(node.update, newScope) : void 0
