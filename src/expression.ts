@@ -17,7 +17,7 @@ const expressionHandler = {
   /** 数组表达式 */
   ArrayExpression: (node: ESTree.ArrayExpression, scope: Scope) =>
     //  遍历执行每个元素并返回
-    node.elements.map((item) => evaluate(item, scope)),
+    node.elements.map((item) => (item ? evaluate(item, scope) : null)),
 
   /** 对象表达式 */
   ObjectExpression: (node: ESTree.ObjectExpression, scope: Scope) => {

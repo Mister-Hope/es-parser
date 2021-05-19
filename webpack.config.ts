@@ -1,6 +1,6 @@
 import * as webpack from "webpack";
 
-module.exports = {
+export = {
   target: "node",
   mode: "production",
   entry: "./src/index.ts",
