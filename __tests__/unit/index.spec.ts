@@ -1,10 +1,8 @@
 import * as compiledParser from "../../dist/parser";
 import * as fs from "fs";
-import { describe, it } from "mocha";
-import { expect } from "chai";
 import parser from "../../src";
 
-const base = "./test/unit";
+const base = "./__tests__/unit";
 
 describe("parser source code test", () => {
   // 解释器执行 hello world

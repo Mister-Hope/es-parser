@@ -1,5 +1,9 @@
 dist/
+
 node_modules/
-test/code.js
-test/debug.js
-test/estree.json
+
+# Tests
+coverage/
+__tests__/code.js
+__tests__/debug.js
+__tests__/estree.json

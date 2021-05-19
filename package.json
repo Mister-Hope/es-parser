@@ -2,6 +2,21 @@
   "name": "es-parser",
   "version": "0.0.1",
   "description": "A mini es parser",
+  "keywords": [
+    "javascript",
+    "parser",
+    "mr-hope"
+  ],
+  "homepage": "https://github.com/Mister-Hope/es-parser",
+  "bugs": {
+    "url": "https://github.com/Mister-Hope/es-parser/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mister-Hope/es-parser.git"
+  },
+  "license": "MIT",
+  "author": "Mr.Hope",
   "main": "dist/parser.js",
   "types": "dist/parser.d.ts",
   "scripts": {
@@ -12,58 +27,55 @@
     "lint:check": "prettier --check . && eslint --ext .js,.ts .",
     "parse": "node ./test/parse.js",
     "prepare": "husky install",
-    "test": "mocha -r ts-node/register test/unit/**/*.ts",
+    "test": "jest -i",
     "test:debug": "mocha -r ts-node/register  --watch test/debug.ts",
     "test:dev": "mocha -r ts-node/register  --watch test/unit/**/*.ts",
     "test:js": "mocha ./test/unit/index.js",
     "test:parser": "ts-node ./test/parser.ts"
   },
-  "publishConfig": {
-    "access": "public"
+  "lint-staged": {
+    "*.{js,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{md,json,yml}": [
+      "prettier --write"
+    ],
+    "package.json": [
+      "sort-package-json"
+    ]
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Mister-Hope/es-parser.git"
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   },
-  "keywords": [
-    "javascript",
-    "parser",
-    "mr-hope"
-  ],
-  "author": "Mr.Hope",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Mister-Hope/es-parser/issues"
-  },
-  "homepage": "https://github.com/Mister-Hope/es-parser",
   "devDependencies": {
-    "@types/chai": "4.2.18",
     "@types/estree": "0.0.47",
-    "@types/mocha": "8.2.2",
+    "@types/jest": "26.0.23",
     "@types/node": "15.3.0",
     "@types/webpack": "5.28.0",
     "@typescript-eslint/eslint-plugin": "4.24.0",
     "@typescript-eslint/parser": "4.24.0",
     "acorn": "8.2.4",
-    "chai": "4.3.4",
     "conventional-changelog-cli": "2.1.1",
     "cz-conventional-changelog": "3.3.0",
     "eslint": "7.26.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.4.0",
     "husky": "6.0.0",
+    "jest": "26.6.3",
     "lint-staged": "11.0.0",
-    "mocha": "8.4.0",
     "prettier": "2.3.0",
+    "sort-package-json": "1.50.0",
+    "ts-jest": "26.5.6",
     "ts-loader": "^8.3.0",
     "ts-node": "9.1.1",
     "typescript": "4.2.4",
     "webpack": "5.37.1",
     "webpack-cli": "4.7.0"
   },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
+  "publishConfig": {
+    "access": "public"
   }
 }

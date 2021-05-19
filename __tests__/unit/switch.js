@@ -27,22 +27,22 @@ const testSwitch = (value) => {
 };
 
 it("should handle default", () => {
-  expect(testSwitch(-1)).to.be.equal(1);
+  expect(testSwitch(-1)).toEqual(1);
 });
 
 it("should handle break", () => {
-  expect(testSwitch(0)).to.be.equal(6);
-  expect(testSwitch(1)).to.be.equal(5);
+  expect(testSwitch(0)).toEqual(6);
+  expect(testSwitch(1)).toEqual(5);
 });
 
 it("should handle fallthrough", () => {
-  expect(testSwitch(3)).to.be.equal(2);
+  expect(testSwitch(3)).toEqual(2);
 });
 
 it("should fallthrough to default", () => {
-  expect(testSwitch(5)).to.be.equal(2);
+  expect(testSwitch(5)).toEqual(2);
 });
 
 it("should handle return", () => {
-  expect(testSwitch(2)).to.be.equal(4);
+  expect(testSwitch(2)).toEqual(4);
 });

@@ -2,39 +2,39 @@
 describe("Number", () => {
   it("int", () => {
     const a = 0;
-    expect(a).to.be.equal(Number(""));
+    expect(a).toEqual(Number(""));
   });
 
   it("decimal", () => {
     const b = 0.123;
-    expect(b).to.be.equal(123 / 1000);
+    expect(b).toEqual(123 / 1000);
   });
 
   it("science", () => {
     const c = 1.3e5;
-    expect(c).to.be.equal(130000);
+    expect(c).toEqual(130000);
   });
 
   it("bin", () => {
     const d = 0b111110111;
-    expect(d).to.be.equal(503);
+    expect(d).toEqual(503);
   });
 
   it("infinity", () => {
     const h = 1 / 0;
-    expect(Number.isFinite(h)).to.be.equal(false);
-    expect(h).to.be.equal(Infinity);
+    expect(Number.isFinite(h)).toEqual(false);
+    expect(h).toEqual(Infinity);
   });
 
   it("NaN", () => {
     const k = "张" * 2;
-    expect(Number.isNaN(k)).to.be.equal(true);
-    expect(k).to.be.not.equal(Number.NaN);
+    expect(Number.isNaN(k)).toEqual(true);
+    expect(Number.NaN === k).toEqual(false);
   });
 
   it("oct", () => {
     const e = 0o767;
-    expect(e).to.be.equal(503);
+    expect(e).toEqual(503);
   });
 
   it("calculate", () => {
@@ -43,28 +43,28 @@ describe("Number", () => {
     let j = 1;
     j += 2;
 
-    expect(f).to.be.equal(7);
-    expect(i).to.be.equal(9);
-    expect(j).to.be.equal(3);
+    expect(f).toEqual(7);
+    expect(i).toEqual(9);
+    expect(j).toEqual(3);
   });
 
   it("transfrom", () => {
     const g = "1" * "2";
-    expect(g).to.be.equal(2);
+    expect(g).toEqual(2);
   });
 });
 
 describe("String test", () => {
   it("simple string", () => {
     const a = "1";
-    expect(a).to.be.equal("1");
+    expect(a).toEqual("1");
   });
 
   it("transferred string", () => {
     const b = "2\n34\\";
-    expect(b).to.be.equal("2\n34\\");
+    expect(b).toEqual("2\n34\\");
     /*
-     *   expect(b).to.be.equal(`2
+     *   expect(b).toEqual(`2
      * 34\\`);
      */
   });
@@ -74,8 +74,8 @@ describe("String test", () => {
      *   const c = `${a}bc${1 + 2 + 3}`;
      *   const d = `中国
      * 加油`;
-     * expect(c).to.be.equal('1bc6');
-     * expect(d).to.be.equal('中国\n加油');
+     * expect(c).toEqual('1bc6');
+     * expect(d).toEqual('中国\n加油');
      */
   });
 });
@@ -83,34 +83,34 @@ describe("String test", () => {
 describe("Array test", () => {
   it("Array declare", () => {
     const a = ["a", 1, true];
-    expect(a).to.be.deep.equal(["a", 1, true]);
-    expect(a[0]).to.be.equal("a");
-    expect(a[1]).to.be.equal(1);
-    expect(a[2]).to.be.equal(true);
-    expect(a[3]).to.be.equal(undefined);
-    expect(a.length).to.be.equal(3);
+    expect(a).toEqual(["a", 1, true]);
+    expect(a[0]).toEqual("a");
+    expect(a[1]).toEqual(1);
+    expect(a[2]).toEqual(true);
+    expect(a[3]).toEqual(undefined);
+    expect(a.length).toEqual(3);
 
     const b = new Array("a", 1, true);
-    expect(b).to.be.deep.equal(["a", 1, true]);
-    expect(b[0]).to.be.equal("a");
-    expect(b[1]).to.be.equal(1);
-    expect(b[2]).to.be.equal(true);
-    expect(b[3]).to.be.equal(undefined);
-    expect(b.length).to.be.equal(3);
+    expect(b).toEqual(["a", 1, true]);
+    expect(b[0]).toEqual("a");
+    expect(b[1]).toEqual(1);
+    expect(b[2]).toEqual(true);
+    expect(b[3]).toEqual(undefined);
+    expect(b.length).toEqual(3);
   });
 });
 
 describe("Object", () => {
   it("can be declared", () => {
     const a = { a: 1, b: 2 };
-    expect(a).to.be.deep.equal({ a: 1, b: 2 });
-    expect(a.a).to.be.equal(1);
-    expect(a.c).to.be.equal(undefined);
+    expect(a).toEqual({ a: 1, b: 2 });
+    expect(a.a).toEqual(1);
+    expect(a.c).toEqual(undefined);
 
     const b = new Object({ a: 1, b: 2 });
-    expect(b).to.be.deep.equal({ a: 1, b: 2 });
-    expect(b.a).to.be.equal(1);
-    expect(b.c).to.be.equal(undefined);
+    expect(b).toEqual({ a: 1, b: 2 });
+    expect(b.a).toEqual(1);
+    expect(b.c).toEqual(undefined);
   });
 
   it("should allow duplicate object key", () => {
@@ -118,8 +118,8 @@ describe("Object", () => {
       a: 1,
       a: 2,
     };
-    expect(obj).to.be.deep.equal({ a: 2 });
-    expect(Object.keys(obj).length).to.be.equal(1);
+    expect(obj).toEqual({ a: 2 });
+    expect(Object.keys(obj).length).toEqual(1);
   });
 
   describe("'s property", () => {
@@ -127,18 +127,18 @@ describe("Object", () => {
 
     it("can be changed", () => {
       a.a = 2;
-      expect(a.a).to.be.equal(2);
+      expect(a.a).toEqual(2);
     });
 
     it("can be added", () => {
       a.c = 3;
-      expect(a.c).to.be.equal(3);
+      expect(a.c).toEqual(3);
     });
 
     it("can be deleted", () => {
       delete a.b;
-      expect(a.b).to.be.equal(undefined);
-      expect(Object.keys(a).indexOf("b")).to.be.equal(-1);
+      expect(a.b).toEqual(undefined);
+      expect(Object.keys(a).indexOf("b")).toEqual(-1);
     });
 
     it("getter", () => {});
@@ -157,8 +157,8 @@ describe("Object", () => {
         },
       };
 
-      expect(a.output()).to.be.equal("Mr.Hope");
-      expect(a.action()).to.be.equal("Mr.Hope");
+      expect(a.output()).toEqual("Mr.Hope");
+      expect(a.action()).toEqual("Mr.Hope");
     });
 
     it("function should resolve this", () => {
@@ -169,7 +169,7 @@ describe("Object", () => {
         },
       };
 
-      expect(a.output()).to.be.equal("Mr.Hope");
+      expect(a.output()).toEqual("Mr.Hope");
     });
 
     it("arrow function shold hold this", () => {
@@ -186,7 +186,7 @@ describe("Object", () => {
               return this.message;
             },
           };
-          expect(c.say()).to.be.equal("message in b");
+          expect(c.say()).toEqual("message in b");
         },
       };
     });
@@ -195,25 +195,25 @@ describe("Object", () => {
 
 describe("Boolean test", () => {
   it("transfrom", () => {
-    expect(3 > 2).to.be.equal(true);
-    expect(true).to.be.equal(!false);
-    expect(!true).to.be.equal(false);
+    expect(3 > 2).toEqual(true);
+    expect(true).toEqual(!false);
+    expect(!true).toEqual(false);
   });
 
   it("calculate", () => {
-    expect(true && true).to.be.equal(true);
-    expect(true && false).to.be.equal(false);
-    expect(false && true).to.be.equal(false);
-    expect(false && false).to.be.equal(false);
-    expect(true || true).to.be.equal(true);
-    expect(true || false).to.be.equal(true);
-    expect(false || true).to.be.equal(true);
-    expect(false || false).to.be.equal(false);
+    expect(true && true).toEqual(true);
+    expect(true && false).toEqual(false);
+    expect(false && true).toEqual(false);
+    expect(false && false).toEqual(false);
+    expect(true || true).toEqual(true);
+    expect(true || false).toEqual(true);
+    expect(false || true).toEqual(true);
+    expect(false || false).toEqual(false);
   });
 });
 
 it("undefined and null test", () => {
-  expect(undefined).not.to.be.equal(null);
+  expect(undefined).not.toEqual(null);
 });
 
 describe("function", () => {
@@ -227,10 +227,10 @@ describe("function", () => {
 
     //   const b = new a();
 
-    //   expect(typeof a).to.be.equal('function');
-    //   expect(typeof b.say).to.be.equal('function');
-    //   expect(b.__proto__).to.be.equal(a.prototype);
-    //   expect(b.__proto__.say).to.be.equal(b.say);
+    //   expect(typeof a).toEqual('function');
+    //   expect(typeof b.say).toEqual('function');
+    //   expect(b.__proto__).toEqual(a.prototype);
+    //   expect(b.__proto__.say).toEqual(b.say);
     // });
 
     it("can be override", () => {
@@ -247,13 +247,13 @@ describe("function", () => {
 
       const b = new a();
 
-      expect(typeof a).to.be.equal("function");
-      expect(b.__proto__).to.be.equal(a.prototype);
-      expect(typeof b.toString).to.be.equal("function");
-      expect(typeof b.valueOf).to.be.equal("function");
-      expect(b.toString).to.be.equal(a.prototype.toString);
-      expect(b.valueOf).to.be.equal(a.prototype.valueOf);
-      expect(b + 1).to.be.equal(2);
+      expect(typeof a).toEqual("function");
+      expect(b.__proto__).toEqual(a.prototype);
+      expect(typeof b.toString).toEqual("function");
+      expect(typeof b.valueOf).toEqual("function");
+      expect(b.toString).toEqual(a.prototype.toString);
+      expect(b.valueOf).toEqual(a.prototype.valueOf);
+      expect(b + 1).toEqual(2);
     });
   });
 });

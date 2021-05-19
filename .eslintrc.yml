@@ -9,7 +9,8 @@ extends:
 
 ignorePatterns:
   - dist/
-  - test/**/*.js
+  - __tests__/**/*.js
+  - __tests__/*.ts
 
 overrides:
   - files:
@@ -28,6 +29,7 @@ overrides:
       parser: "@typescript-eslint/parser"
       project:
         - "./tsconfig.json"
+        - "./tsconfig.test.json"
 
     rules:
       "@typescript-eslint/explicit-function-return-type":
@@ -89,7 +91,7 @@ overrides:
         - off
 
   - files:
-      - "**/__tests__/**/*.spec.{j,t}s?(x)"
+      - "__tests__/**/*.spec.{j,t}s"
 
     env:
       jest: true
@@ -104,6 +106,7 @@ overrides:
         - off
 
   - files:
+      - "jest.config.js"
       - "webpack.config.js"
 
     env:
