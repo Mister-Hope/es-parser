@@ -1,14 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as ESTree from "estree";
-import * as acorn from "acorn";
 import { Scope } from "./scope";
 import { evaluate } from "./eval";
-
-const options: acorn.Options = {
-  ecmaVersion: 6,
-  sourceType: "script",
-  locations: true,
-};
+import { parse } from "./parse";
 
 // 导出默认对象
 const globalVar: { [key: string]: any } = {
@@ -51,9 +45,6 @@ const globalVar: { [key: string]: any } = {
   Promise,
   Infinity,
 };
-
-/** 解析代码 */
-export const parse = (code: string): acorn.Node => acorn.parse(code, options);
 
 /** 运行代码 */
 export const run = (
