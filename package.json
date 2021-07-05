@@ -63,7 +63,7 @@
     "acorn": "8.2.4",
     "conventional-changelog-cli": "2.1.1",
     "cz-conventional-changelog": "3.3.0",
-    "eslint": "7.26.0",
+    "eslint": "7.30.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.4.0",
     "husky": "6.0.0",
