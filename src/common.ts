@@ -1,31 +1,7 @@
 import * as ESTree from "estree";
 import { Scope } from "./scope";
 import { evaluate } from "./eval";
-
-/** Break 标志 */
-export class Break {
-  constructor(public label?: string) {}
-}
-
-/** Continue 标志 */
-export class Continue {
-  constructor(public label?: string) {}
-}
-
-/** Return 标志 */
-export class Return {
-  constructor(public result: any) {}
-}
-
-/** 获得代码位置 */
-export const getStack = (
-  node: ESTree.Node,
-  type: "start" | "end" = "start"
-): string => {
-  const loc = node.loc?.[type];
-
-  return loc ? `\n    at ${loc.line}:${loc.column}` : "";
-};
+import { Return } from "./singal";
 
 /** 获得 this */
 export const getThis = (scope: Scope): any =>

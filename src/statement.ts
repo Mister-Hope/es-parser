@@ -1,6 +1,14 @@
 import * as ESTree from "estree";
-import { Break, Continue, Return, handleDeclaration } from "./common";
+import { handleDeclaration } from "./common";
 import { Scope } from "./scope";
+import {
+  Break,
+  Continue,
+  Return,
+  isBreak,
+  isContinue,
+  isReturn,
+} from "./singal";
 import { evaluate } from "./eval";
 
 const statementHandler = {
@@ -28,11 +36,7 @@ const statementHandler = {
       if (node.type !== "FunctionDeclaration") {
         const result = evaluate(node, blockScope);
 
-        if (
-          result instanceof Break ||
-          result instanceof Continue ||
-          result instanceof Return
-        )
+        if (isBreak(result) || isContinue(result) || isReturn(result))
           return result;
       }
 
@@ -104,9 +108,8 @@ const statementHandler = {
       if (matched) {
         const result = evaluate($case, newScope);
 
-        if (result instanceof Break) break;
-        else if (result instanceof Continue || result instanceof Return)
-          return result;
+        if (isBreak(result)) break;
+        else if (isContinue(result) || isReturn(result)) return result;
       }
     }
 
@@ -142,9 +145,9 @@ const statementHandler = {
       const newScope = new Scope("loop", scope);
       const result = evaluate(node.body, newScope);
 
-      if (result instanceof Break) break;
-      else if (result instanceof Continue) continue;
-      else if (result instanceof Return) return result;
+      if (isBreak(result)) break;
+      else if (isContinue(result)) continue;
+      else if (isReturn(result)) return result;
     }
 
     return undefined;
@@ -158,9 +161,9 @@ const statementHandler = {
       const newScope = new Scope("loop", scope);
       const result = evaluate(node.body, newScope);
 
-      if (result instanceof Break) break;
-      else if (result instanceof Continue) continue;
-      else if (result instanceof Return) return result;
+      if (isBreak(result)) break;
+      else if (isContinue(result)) continue;
+      else if (isReturn(result)) return result;
     } while (evaluate(node.test, scope));
 
     return undefined;
@@ -178,9 +181,9 @@ const statementHandler = {
     ) {
       const result = evaluate(node.body, newScope);
 
-      if (result instanceof Break) break;
-      else if (result instanceof Continue) continue;
-      else if (result instanceof Return) return result;
+      if (isBreak(result)) break;
+      else if (isContinue(result)) continue;
+      else if (isReturn(result)) return result;
     }
 
     return undefined;
@@ -201,9 +204,9 @@ const statementHandler = {
       scope.declare(kind, name, value);
       const result = evaluate(node.body, newScope);
 
-      if (result instanceof Break) break;
-      else if (result instanceof Continue) continue;
-      else if (result instanceof Return) return result;
+      if (isBreak(result)) break;
+      else if (isContinue(result)) continue;
+      else if (isReturn(result)) return result;
     }
 
     return undefined;

@@ -1,8 +1,9 @@
 /** 声明处理 */
 import * as ESTree from "estree";
-import { getFunction, getStack } from "./common";
+import { getFunction } from "./common";
 import { Scope } from "./scope";
 import { evaluate } from "./eval";
+import { getStack } from "./utils";
 
 /** 变量声明 */
 export const VariableDeclaration = (

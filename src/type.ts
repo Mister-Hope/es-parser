@@ -51,8 +51,11 @@ export interface NodeTypeMap {
   ClassExpression: ESTree.ClassExpression;
   MetaProperty: ESTree.MetaProperty;
   AwaitExpression: ESTree.AwaitExpression;
+  ChainExpression: ESTree.ChainExpression;
   ImportExpression: ESTree.ImportExpression;
+  PrivateIdentifier: ESTree.PrivateIdentifier;
   Property: ESTree.Property;
+  PropertyDefinition: ESTree.ExportSpecifier;
   Super: ESTree.Super;
   TemplateElement: ESTree.TemplateElement;
   SpreadElement: ESTree.SpreadElement;
@@ -74,8 +77,6 @@ export interface NodeTypeMap {
 
 export type EvaluateMap = {
   [key in ESTree.Node["type"]]: (
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     node: NodeTypeMap[key],
     scope: Scope,
     arg?: any

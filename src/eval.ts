@@ -1,7 +1,8 @@
 import * as ESTree from "estree";
-import { Break, Continue, Return, handleDeclaration } from "./common";
+import { handleDeclaration } from "./common";
 import { EvaluateFunc, EvaluateMap } from "./type";
 import { Scope } from "./scope";
+import { isBreak, isContinue, isReturn } from "./singal";
 import {
   ClassDeclaration,
   FunctionDeclaration,
@@ -71,11 +72,7 @@ const evaluateMap: EvaluateMap = {
     for (const statement of node.consequent) {
       const result = evaluate(statement, scope);
       // 执行停止并返回相应状态
-      if (
-        result instanceof Break ||
-        result instanceof Continue ||
-        result instanceof Return
-      )
+      if (isBreak(result) || isContinue(result) || isReturn(result))
         return result;
     }
 
