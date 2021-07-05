@@ -3,6 +3,7 @@ import { getFunction, getMember, getMemberVariable, getThis } from "./common";
 import { Scope } from "./scope";
 import { Variable } from "./variable";
 import { evaluate } from "./eval";
+import { errorGenerator } from "./utils";
 
 /** `this` 表达式 */
 export const ThisExpression = (
@@ -39,10 +40,7 @@ export const ObjectExpression = (
           propertyName = property.key.name;
           break;
         default:
-          // 暂不能处理该键值的对象 TODO: 完善
-          throw new Error(
-            `Can not handle object property in type '${property.key.type}'`
-          );
+          errorGenerator(property.key.type);
       }
 
       // 获得对应的值
@@ -84,11 +82,10 @@ export const ArrowFunctionExpression = (
 
 /** yield 表达式 */
 export const YieldExpression = (
-  _node: ESTree.YieldExpression,
+  node: ESTree.YieldExpression,
   _scope: Scope
 ): any => {
-  // 小程序环境不支持
-  throw new Error("yield not supported in Wechat Miniprogram");
+  errorGenerator(node.type);
 };
 
 /** 一元运算 */
@@ -300,36 +297,41 @@ export const TemplateLiteral = (
   node: ESTree.TemplateLiteral,
   _scope: Scope
 ): void => {
-  throw new Error(`${node.type} 未实现`);
+  errorGenerator(node.type);
 };
 
 export const TaggedTemplateExpression = (
   node: ESTree.TaggedTemplateExpression,
   _scope: Scope
 ): void => {
-  throw new Error(`${node.type} 未实现`);
+  errorGenerator(node.type);
 };
 
 export const ClassExpression = (
-  _node: ESTree.ClassExpression,
+  node: ESTree.ClassExpression,
   _scope: Scope
 ): void => {
-  // 小程序环境不支持
-  throw new Error("class not supported in Wechat Miniprogram");
+  errorGenerator(node.type);
 };
 
 export const MetaProperty = (
   node: ESTree.MetaProperty,
   _scope: Scope
 ): void => {
-  throw new Error(`${node.type} 未实现`);
+  errorGenerator(node.type);
 };
 
 export const AwaitExpression = (
-  _node: ESTree.AwaitExpression,
+  node: ESTree.AwaitExpression,
   _scope: Scope
 ): void => {
   // TODO: Support it
-  // 小程序环境不支持
-  throw new Error("await not supported in Wechat Miniprogram");
+  errorGenerator(node.type);
+};
+
+export const ChainExpression = (
+  node: ESTree.ChainExpression,
+  _scope: Scope
+): void => {
+  errorGenerator(node.type);
 };

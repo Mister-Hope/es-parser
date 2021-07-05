@@ -9,3 +9,7 @@ export const getStack = (
 
   return loc ? `\n    at ${loc.line}:${loc.column}` : "";
 };
+
+export const errorGenerator = (type: string): void => {
+  throw new Error(`${type} not supported`);
+};

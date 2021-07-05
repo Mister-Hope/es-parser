@@ -1,66 +1,62 @@
 import * as ESTree from "estree";
 import { Scope } from "./scope";
+import { errorGenerator } from "./utils";
 
 // TODO: build it
-export const MethodDefinition = (
-  node: ESTree.MethodDefinition,
-  _scope: Scope
-): void => {
-  throw new Error(`${node.type} 未实现`);
-};
 
-export const ImportDeclaration = (
-  node: ESTree.ImportDeclaration,
-  _scope: Scope
-): void => {
-  throw new Error(`${node.type} 未实现`);
-};
+export const moduleHandler = {
+  MethodDefinition: (node: ESTree.MethodDefinition, _scope: Scope): void => {
+    errorGenerator(node.type);
+  },
 
-export const ImportSpecifier = (
-  node: ESTree.ImportSpecifier,
-  _scope: Scope
-): void => {
-  throw new Error(`${node.type} 未实现`);
-};
+  ImportDeclaration: (node: ESTree.ImportDeclaration, _scope: Scope): void => {
+    errorGenerator(node.type);
+  },
 
-export const ImportDefaultSpecifier = (
-  node: ESTree.ImportDefaultSpecifier,
-  _scope: Scope
-): void => {
-  throw new Error(`${node.type} 未实现`);
-};
+  ImportExpression: (node: ESTree.ImportExpression, _scope: Scope): void => {
+    errorGenerator(node.type);
+  },
 
-export const ImportNamespaceSpecifier = (
-  node: ESTree.ImportNamespaceSpecifier,
-  _scope: Scope
-): void => {
-  throw new Error(`${node.type} 未实现`);
-};
+  ImportSpecifier: (node: ESTree.ImportSpecifier, _scope: Scope): void => {
+    errorGenerator(node.type);
+  },
 
-export const ExportNamedDeclaration = (
-  node: ESTree.ExportNamedDeclaration,
-  _scope: Scope
-): void => {
-  throw new Error(`${node.type} 未实现`);
-};
+  ImportDefaultSpecifier: (
+    node: ESTree.ImportDefaultSpecifier,
+    _scope: Scope
+  ): void => {
+    errorGenerator(node.type);
+  },
 
-export const ExportDefaultDeclaration = (
-  node: ESTree.ExportDefaultDeclaration,
-  _scope: Scope
-): void => {
-  throw new Error(`${node.type} 未实现`);
-};
+  ImportNamespaceSpecifier: (
+    node: ESTree.ImportNamespaceSpecifier,
+    _scope: Scope
+  ): void => {
+    errorGenerator(node.type);
+  },
 
-export const ExportAllDeclaration = (
-  node: ESTree.ExportAllDeclaration,
-  _scope: Scope
-): void => {
-  throw new Error(`${node.type} 未实现`);
-};
+  ExportNamedDeclaration: (
+    node: ESTree.ExportNamedDeclaration,
+    _scope: Scope
+  ): void => {
+    errorGenerator(node.type);
+  },
 
-export const ExportSpecifier = (
-  node: ESTree.ExportSpecifier,
-  _scope: Scope
-): void => {
-  throw new Error(`${node.type} 未实现`);
+  ExportDefaultDeclaration: (
+    node: ESTree.ExportDefaultDeclaration,
+    _scope: Scope
+  ): void => {
+    errorGenerator(node.type);
+  },
+
+  ExportAllDeclaration: (
+    node: ESTree.ExportAllDeclaration,
+    _scope: Scope
+  ): void => {
+    errorGenerator(node.type);
+  },
+
+  ExportSpecifier: (node: ESTree.ExportSpecifier, _scope: Scope): void => {
+    errorGenerator(node.type);
+  },
 };

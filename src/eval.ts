@@ -30,24 +30,15 @@ import {
   ClassExpression,
   MetaProperty,
   AwaitExpression,
+  ChainExpression,
 } from "./expression";
-import {
-  MethodDefinition,
-  ImportDeclaration,
-  ImportSpecifier,
-  ImportDefaultSpecifier,
-  ImportNamespaceSpecifier,
-  ExportNamedDeclaration,
-  ExportAllDeclaration,
-  ExportDefaultDeclaration,
-  ExportSpecifier,
-} from "./module";
+import { moduleHandler } from "./module";
 import patternHandler from "./pattern";
 import statementHandler from "./statement";
+import { errorGenerator } from "./utils";
 
 /** 操作列表 */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+
 const evaluateMap: EvaluateMap = {
   /** 标识符 */
   Identifier: (node: ESTree.Identifier, scope: Scope) =>
@@ -82,28 +73,28 @@ const evaluateMap: EvaluateMap = {
   CatchClause: (node: ESTree.CatchClause, scope: Scope) =>
     evaluate(node.body, scope),
 
-  VariableDeclarator: (_node: ESTree.VariableDeclarator, _scope: Scope) => {
-    throw new Error("不应出现");
+  VariableDeclarator: (node: ESTree.VariableDeclarator, _scope: Scope) => {
+    errorGenerator(node.type);
   },
 
-  Property: (_node: ESTree.Property, _scope: Scope, _computed: boolean) => {
-    throw new Error("不应出现");
+  Property: (node: ESTree.Property, _scope: Scope, _computed: boolean) => {
+    errorGenerator(node.type);
   },
 
   Super: (node: ESTree.Super, _scope: Scope) => {
-    throw new Error(`${node.type} 未实现`);
+    errorGenerator(node.type);
   },
 
   TemplateElement: (node: ESTree.TemplateElement, _scope: Scope) => {
-    throw new Error(`${node.type} 未实现`);
+    errorGenerator(node.type);
   },
 
   SpreadElement: (node: ESTree.SpreadElement, _scope: Scope) => {
-    throw new Error(`${node.type} 未实现`);
+    errorGenerator(node.type);
   },
 
   ClassBody: (node: ESTree.ClassBody, _scope: Scope) => {
-    throw new Error(`${node.type} 未实现`);
+    errorGenerator(node.type);
   },
 
   ClassDeclaration,
@@ -130,15 +121,21 @@ const evaluateMap: EvaluateMap = {
   ClassExpression,
   MetaProperty,
   AwaitExpression,
-  MethodDefinition,
-  ImportDeclaration,
-  ImportSpecifier,
-  ImportDefaultSpecifier,
-  ImportNamespaceSpecifier,
-  ExportNamedDeclaration,
-  ExportAllDeclaration,
-  ExportDefaultDeclaration,
-  ExportSpecifier,
+  ChainExpression,
+
+  PrivateIdentifier: (node: ESTree.PrivateIdentifier, _scope: Scope): void => {
+    errorGenerator(node.type);
+  },
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  PropertyDefinition: (
+    node: ESTree.PropertyDefinition,
+    _scope: Scope
+  ): void => {
+    errorGenerator(node.type);
+  },
+  ...moduleHandler,
   ...patternHandler,
   ...statementHandler,
 };
