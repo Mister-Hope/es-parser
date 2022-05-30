@@ -60,7 +60,7 @@
     "@types/webpack": "5.28.0",
     "@typescript-eslint/eslint-plugin": "4.28.1",
     "@typescript-eslint/parser": "4.33.0",
-    "acorn": "8.4.1",
+    "acorn": "8.7.1",
     "babylon": "^6.18.0",
     "conventional-changelog-cli": "2.1.1",
     "cz-conventional-changelog": "3.3.0",
