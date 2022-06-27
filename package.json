@@ -54,7 +54,7 @@
     "@rollup/plugin-commonjs": "19.0.0",
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@rollup/plugin-typescript": "8.2.1",
-    "@types/estree": "0.0.49",
+    "@types/estree": "0.0.52",
     "@types/jest": "26.0.23",
     "@types/node": "16.0.0",
     "@types/webpack": "5.28.0",
